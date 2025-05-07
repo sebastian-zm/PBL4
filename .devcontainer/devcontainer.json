@@ -1,0 +1,39 @@
+{
+  "name": "Oposiciones-ML-DevContainer",
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash",
+    "maven.executable.path": "/workspace/mvnw"
+  },
+  "extensions": [
+    "redhat.java",
+    "vscjava.vscode-java-pack",
+    "vscjava.vscode-spring-boot",
+    "vscjava.vscode-maven",
+    "ms-python.python",
+    "ms-toolsai.jupyter",
+    "cweijan.vscode-database-client",
+    "formulahendry.vscode-mysql",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-azuretools.vscode-docker"
+  ],
+  "forwardPorts": [
+    3306,
+    8080,
+    3000,
+    8888
+  ],
+  "postCreateCommand": "scripts/init-python-env.sh && scripts/init-db.sh && echo \"✔ Entorno inicializado\"",
+  "remoteUser": "vscode",
+  "mounts": [
+    "source=m2-cache,target=/home/vscode/.m2,type=volume",
+    "source=npm-cache,target=/home/vscode/.npm,type=volume"
+  ]
+}
