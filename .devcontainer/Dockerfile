@@ -5,7 +5,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       curl git unzip nodejs npm \
-      python3 python3-venv python3-pip && \
+      python3 python3-venv python3-pip \
+      default-mysql-client && \
     rm -rf /var/lib/apt/lists/*
 
 # Sólo pip base; el resto se instala en el venv en postCreate
@@ -15,9 +16,11 @@ ENV JAVA_HOME=/usr/local/openjdk-17
 ENV PATH=$JAVA_HOME/bin:$PATH
 
 # Copiamos y damos permiso a los scripts
-COPY scripts /scripts
+COPY .devcontainer/scripts /scripts
 RUN chmod +x /scripts/*.sh
 
 USER vscode
 WORKDIR /workspace
+
+CMD ["sleep", "infinity"]
 

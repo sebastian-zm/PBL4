@@ -30,10 +30,11 @@
     3000,
     8888
   ],
-  "postCreateCommand": "scripts/init-python-env.sh && scripts/init-db.sh && echo \"✔ Entorno inicializado\"",
+  "postCreateCommand": ".devcontainer/scripts/init-python-env.sh && .devcontainer/scripts/init-db.sh && echo \"✔ Entorno inicializado\"",
   "remoteUser": "vscode",
   "mounts": [
     "source=m2-cache,target=/home/vscode/.m2,type=volume",
     "source=npm-cache,target=/home/vscode/.npm,type=volume"
-  ]
+  ],
+  "updateRemoteUserUID": false
 }

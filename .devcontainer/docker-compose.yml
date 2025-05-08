@@ -5,10 +5,16 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: oposiciones
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: dev
+      MYSQL_HOST: db
     volumes:
-      - ..:/workspace:cached
-      - m2-cache:/home/vscode/.m2
-      - npm-cache:/home/vscode/.npm
+      - ..:/workspace:cached,Z
+      - m2-cache:/home/vscode/.m2:Z
+      - npm-cache:/home/vscode/.npm:Z
     ports:
       - "8080:8080"
       - "3000:3000"
@@ -17,7 +23,7 @@ services:
       - db
 
   db:
-    image: mysql:8.0
+    image: docker.io/mysql:8.0
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -27,7 +33,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data:/var/lib/mysql:Z
 
 volumes:
   db-data:
