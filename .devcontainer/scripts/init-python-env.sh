@@ -17,5 +17,5 @@ else
   pip install jupyterlab pandas scikit-learn matplotlib seaborn openai
 fi
 
-echo "✅ Entorno Python listo en $VENV_DIR"
+echo "✅ Entorno Python listo"
 

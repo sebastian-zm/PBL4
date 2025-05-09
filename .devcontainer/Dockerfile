@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/java:0-17
+FROM registry.gitlab.com/mu-bd-ce/devcontainers/java
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -9,9 +9,6 @@ RUN apt-get update && \
       default-mysql-client && \
     rm -rf /var/lib/apt/lists/*
 
-# Sólo pip base; el resto se instala en el venv en postCreate
-RUN pip3 install --no-cache-dir --upgrade pip
-
 ENV JAVA_HOME=/usr/local/openjdk-17
 ENV PATH=$JAVA_HOME/bin:$PATH
 
@@ -19,7 +16,8 @@ ENV PATH=$JAVA_HOME/bin:$PATH
 COPY .devcontainer/scripts /scripts
 RUN chmod +x /scripts/*.sh
 
-USER vscode
+USER ubuntu
+
 WORKDIR /workspace
 
 CMD ["sleep", "infinity"]

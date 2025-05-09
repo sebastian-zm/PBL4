@@ -8,7 +8,9 @@
     "vscode": {
       "settings": {
         "terminal.integrated.shell.linux": "/bin/bash",
-        "maven.executable.path": "/workspace/mvnw"
+        "maven.executable.path": "/workspace/mvnw",
+        // Path to the Python interpreter in the virtual environment.
+        "python.defaultInterpreterPath": "${containerEnv:HOME}/.venv/bin/python"
       },
       "extensions": [
         "redhat.java",
@@ -22,25 +24,16 @@
         "eamodio.gitlens",
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "mechatroner.rainbow-csv"
       ]
     }
   },
   "forwardPorts": [3306, 8080, 3000, 8888],
   "postCreateCommand": ".devcontainer/scripts/init-python-env.sh && .devcontainer/scripts/init-db.sh && echo \"✔ Entorno inicializado\"",
-  "remoteUser": "vscode",
-  "updateRemoteUserUID": false,
   "mounts": [
     "source=m2-cache,target=/home/vscode/.m2,type=volume",
-    "source=npm-cache,target=/home/vscode/.npm,type=volume"
-  ],
-  // Ensure proper mapping of user and group IDs in Podman.
-  // Uncomment the following lines if using Podman to maintain user ID and group ID consistency.
-  // "runArgs": [
-  //     "--userns=keep-id:uid=1000,gid=1000"
-  // ],
-  // Disable SELinux for the container. Only tested with rootless podman.
-  // TODO: Investigate if it is possible to automatically relabel workspaces with :z.
-  // Reference: https://docs.podman.io/en/latest/markdown/podman-run.1.html#volume-v-source-volume-host-dir-container-dir-options
-  "securityOpt": ["label=disable"]
+    "source=npm-cache,target=/home/vscode/.npm,type=volume",
+    "source=venv-cache,target=/home/vscode/.venv,type=volume"
+  ]
 }

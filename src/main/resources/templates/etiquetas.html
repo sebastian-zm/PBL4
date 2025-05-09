@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Etiquetas</title>
+  <link
+    th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}"
+    rel="stylesheet"/>
+</head>
+<body>
+<div class="container mt-4">
+
+  <h1>Etiquetas</h1>
+
+  <!-- create form -->
+  <form th:action="@{/etiquetas}" method="post" class="row g-2 mb-4">
+    <div class="col-md-4">
+      <input type="text" class="form-control" name="nombre" placeholder="Nombre" required>
+    </div>
+    <div class="col-md-5">
+      <input type="text" class="form-control" name="descripcion" placeholder="Descripción">
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary w-100">Crear Etiqueta</button>
+    </div>
+  </form>
+
+  <!-- list & inline edit -->
+  <table class="table table-striped">
+    <thead class="table-light">
+    <tr>
+      <th>ID</th><th>Nombre</th><th>Descripción</th><th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="et : ${etiquetas}">
+      <td th:text="${et.etiquetaId}"></td>
+      <td th:text="${et.nombre}"></td>
+      <td th:text="${et.descripcion}"></td>
+      <td>
+        <button class="btn btn-sm btn-secondary"
+                th:onclick="'showEdit('+${et.etiquetaId}+')'">✎</button>
+        <form th:action="@{'/etiquetas/' + ${et.etiquetaId} + '/delete'}"
+              method="post" style="display:inline;"
+              onsubmit="return confirm('¿Seguro?');">
+          <button class="btn btn-sm btn-danger">🗑</button>
+        </form>
+      </td>
+    </tr>
+    <!-- hidden edit‐row -->
+    <tr th:each="et : ${etiquetas}"
+        th:id="${'editRow-'+et.etiquetaId}"
+        style="display:none; background:#f9f9f9;">
+      <form th:action="@{'/etiquetas/' + ${et.etiquetaId} + '/edit'}"
+            method="post">
+        <td th:text="${et.etiquetaId}"></td>
+        <td>
+          <input class="form-control" type="text" name="nombre"
+                 th:value="${et.nombre}" required>
+        </td>
+        <td>
+          <input class="form-control" type="text" name="descripcion"
+                 th:value="${et.descripcion}">
+        </td>
+        <td>
+          <button class="btn btn-sm btn-primary">✔ Guardar</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary"
+                  th:onclick="'hideEdit('+${et.etiquetaId}+')'">
+            ✕ Cancelar
+          </button>
+        </td>
+      </form>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- assign parent→child -->
+  <h2>Agregar relación Padre → Hijo</h2>
+  <form th:action="@{/etiquetas/relacion}" method="post" class="row g-2">
+    <div class="col-md-5">
+      <select class="form-select" name="parentId" required>
+        <option th:each="et : ${etiquetas}"
+                th:value="${et.etiquetaId}"
+                th:text="${et.nombre}">Etiqueta</option>
+      </select>
+    </div>
+    <div class="col-md-5">
+      <select class="form-select" name="childId" required>
+        <option th:each="et : ${etiquetas}"
+                th:value="${et.etiquetaId}"
+                th:text="${et.nombre}">Etiqueta</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-success w-100">Relacionar</button>
+    </div>
+  </form>
+
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+<script>
+  function showEdit(id) {
+    document.getElementById('editRow-'+id).style.display = 'table-row';
+  }
+  function hideEdit(id) {
+    document.getElementById('editRow-'+id).style.display = 'none';
+  }
+</script>
+</body>
+</html>

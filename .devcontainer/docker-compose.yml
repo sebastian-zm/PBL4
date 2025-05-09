@@ -5,6 +5,7 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
+    image: localhost/pbl4_devcontainer-app
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: oposiciones
@@ -13,8 +14,9 @@ services:
       MYSQL_HOST: db
     volumes:
       - ..:/workspace:cached,Z
-      - m2-cache:/home/vscode/.m2:Z
-      - npm-cache:/home/vscode/.npm:Z
+      - venv-cache:/home/ubuntu/.venv:Z
+      - m2-cache:/home/ubuntu/.m2:Z
+      - npm-cache:/home/ubuntu/.npm:Z
     ports:
       - "8080:8080"
       - "3000:3000"
@@ -39,4 +41,5 @@ volumes:
   db-data:
   m2-cache:
   npm-cache:
+  venv-cache:
 
