@@ -1,0 +1,119 @@
+-- Flyway migration script
+-- Created: Fri 09 May 2025 10:56:03 AM UTC
+
+-- Write your SQL below this line
+-- Table: USUARIO
+CREATE TABLE USUARIO (
+    usuarioId INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    passwordHash VARCHAR(255) NOT NULL,
+    permisos INT NOT NULL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Table: ETIQUETA
+CREATE TABLE ETIQUETA (
+    etiquetaId INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL UNIQUE,
+    descripcion VARCHAR(255),
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Table: ARBOL_ETIQUETAS
+CREATE TABLE ARBOL_ETIQUETAS (
+    ancestroId INT NOT NULL,
+    descendienteId INT NOT NULL,
+    distancia INT NOT NULL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (ancestroId, descendienteId),
+    FOREIGN KEY (ancestroId) REFERENCES ETIQUETA(etiquetaId),
+    FOREIGN KEY (descendienteId) REFERENCES ETIQUETA(etiquetaId)
+);
+
+-- Table: CONVOCATORIA
+CREATE TABLE CONVOCATORIA (
+    convocatoriaId INT AUTO_INCREMENT PRIMARY KEY,
+    boeId VARCHAR(255) NOT NULL UNIQUE,
+    titulo VARCHAR(255) NOT NULL,
+    texto TEXT NOT NULL,
+    fechaPublicacion DATETIME NOT NULL,
+    enlace VARCHAR(255) NOT NULL,
+    datosExtra JSON,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Table: MODELO
+CREATE TABLE MODELO (
+    modeloId INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL UNIQUE,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Table: ETIQUETADO
+CREATE TABLE ETIQUETADO (
+    convocatoriaId INT NOT NULL,
+    etiquetaId INT NOT NULL,
+    modeloId INT NOT NULL,
+    valoracion INT,
+    confianza FLOAT,
+    status INT,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (convocatoriaId, etiquetaId, modeloId),
+    FOREIGN KEY (convocatoriaId) REFERENCES CONVOCATORIA(convocatoriaId),
+    FOREIGN KEY (etiquetaId) REFERENCES ETIQUETA(etiquetaId),
+    FOREIGN KEY (modeloId) REFERENCES MODELO(modeloId)
+);
+
+-- Table: FEEDBACK
+CREATE TABLE FEEDBACK (
+    usuarioId INT NOT NULL,
+    convocatoriaId INT NOT NULL,
+    etiquetaId INT NOT NULL,
+    aprobado BOOLEAN NOT NULL,
+    fecha DATETIME NOT NULL,
+    comentario VARCHAR(255),
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (usuarioId, convocatoriaId, etiquetaId),
+    FOREIGN KEY (usuarioId) REFERENCES USUARIO(usuarioId),
+    FOREIGN KEY (convocatoriaId, etiquetaId) REFERENCES ETIQUETADO(convocatoriaId, etiquetaId)
+);
+
+-- Table: SUSCRIPCION
+CREATE TABLE SUSCRIPCION (
+    suscripcionId INT AUTO_INCREMENT PRIMARY KEY,
+    usuarioId INT NOT NULL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuarioId) REFERENCES USUARIO(usuarioId)
+);
+
+-- Table: SUSCRIPCION_ETIQUETA
+CREATE TABLE SUSCRIPCION_ETIQUETA (
+    suscripcionId INT NOT NULL,
+    etiquetaId INT NOT NULL,
+    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (suscripcionId, etiquetaId),
+    FOREIGN KEY (suscripcionId) REFERENCES SUSCRIPCION(suscripcionId),
+    FOREIGN KEY (etiquetaId) REFERENCES ETIQUETA(etiquetaId)
+);
+
+-- Create indexes for better performance
+CREATE INDEX idx_arbol_etiquetas_ancestro ON ARBOL_ETIQUETAS(ancestroId);
+CREATE INDEX idx_arbol_etiquetas_descendiente ON ARBOL_ETIQUETAS(descendienteId);
+CREATE INDEX idx_etiquetado_convocatoria ON ETIQUETADO(convocatoriaId);
+CREATE INDEX idx_etiquetado_etiqueta ON ETIQUETADO(etiquetaId);
+CREATE INDEX idx_etiquetado_modelo ON ETIQUETADO(modeloId);
+CREATE INDEX idx_feedback_usuario ON FEEDBACK(usuarioId);
+CREATE INDEX idx_feedback_convocatoria_etiqueta ON FEEDBACK(convocatoriaId, etiquetaId);
+CREATE INDEX idx_suscripcion_usuario ON SUSCRIPCION(usuarioId);
+CREATE INDEX idx_suscripcion_etiqueta_suscripcion ON SUSCRIPCION_ETIQUETA(suscripcionId);
+CREATE INDEX idx_suscripcion_etiqueta_etiqueta ON SUSCRIPCION_ETIQUETA(etiquetaId);

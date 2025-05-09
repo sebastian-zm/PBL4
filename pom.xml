@@ -98,6 +98,14 @@
     		<groupId>nz.net.ultraq.thymeleaf</groupId>
     		<artifactId>thymeleaf-layout-dialect</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>  
+			<groupId>org.flywaydb</groupId>  
+			<artifactId>flyway-mysql</artifactId>  
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -106,6 +114,19 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!-- <plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>10.20.1</version>
+				<configuration>
+					<url>jdbc:mysql://${MYSQL_HOST}:3306/oposiciones</url>
+					<user>${MYSQL_USER}</user>
+					<password>${MYSQL_PASSWORD}</password>
+					<locations>classpath:db/migration</locations>
+					<baselineOnMigrate>true</baselineOnMigrate>
+					<validateOnMigrate>true</validateOnMigrate>
+				</configuration>
+			</plugin> -->
 		</plugins>
 	</build>
 

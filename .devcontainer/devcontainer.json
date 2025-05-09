@@ -1,40 +1,46 @@
 {
   "name": "Oposiciones-ML-DevContainer",
-  "dockerComposeFile": [
-    "docker-compose.yml"
-  ],
+  "dockerComposeFile": ["docker-compose.yml"],
   "service": "app",
   "workspaceFolder": "/workspace",
   "shutdownAction": "stopCompose",
-  "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash",
-    "maven.executable.path": "/workspace/mvnw"
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "maven.executable.path": "/workspace/mvnw"
+      },
+      "extensions": [
+        "redhat.java",
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-spring-boot",
+        "vscjava.vscode-maven",
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "cweijan.vscode-database-client",
+        "formulahendry.vscode-mysql",
+        "eamodio.gitlens",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
   },
-  "extensions": [
-    "redhat.java",
-    "vscjava.vscode-java-pack",
-    "vscjava.vscode-spring-boot",
-    "vscjava.vscode-maven",
-    "ms-python.python",
-    "ms-toolsai.jupyter",
-    "cweijan.vscode-database-client",
-    "formulahendry.vscode-mysql",
-    "eamodio.gitlens",
-    "esbenp.prettier-vscode",
-    "dbaeumer.vscode-eslint",
-    "ms-azuretools.vscode-docker"
-  ],
-  "forwardPorts": [
-    3306,
-    8080,
-    3000,
-    8888
-  ],
+  "forwardPorts": [3306, 8080, 3000, 8888],
   "postCreateCommand": ".devcontainer/scripts/init-python-env.sh && .devcontainer/scripts/init-db.sh && echo \"✔ Entorno inicializado\"",
   "remoteUser": "vscode",
   "updateRemoteUserUID": false,
   "mounts": [
     "source=m2-cache,target=/home/vscode/.m2,type=volume",
     "source=npm-cache,target=/home/vscode/.npm,type=volume"
-  ]
+  ],
+  // Ensure proper mapping of user and group IDs in Podman.
+  // Uncomment the following lines if using Podman to maintain user ID and group ID consistency.
+  // "runArgs": [
+  //     "--userns=keep-id:uid=1000,gid=1000"
+  // ],
+  // Disable SELinux for the container. Only tested with rootless podman.
+  // TODO: Investigate if it is possible to automatically relabel workspaces with :z.
+  // Reference: https://docs.podman.io/en/latest/markdown/podman-run.1.html#volume-v-source-volume-host-dir-container-dir-options
+  "securityOpt": ["label=disable"]
 }
