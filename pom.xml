@@ -86,6 +86,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.webjars.npm</groupId>
+			<artifactId>fortawesome__fontawesome-free</artifactId>
+			<version>6.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars.npm</groupId>
 			<artifactId>hotwired__stimulus</artifactId>
 			<version>3.2.2</version>
 		</dependency>

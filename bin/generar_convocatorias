@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import requests
 import feedparser
 import pdfplumber
@@ -8,14 +10,13 @@ from datetime import datetime
 from pathlib import Path
 import mysql.connector
 import csv
-
-from extractor import extract_fields
+from bs4 import BeautifulSoup
 
 # ----------------------------
 # CONFIGURACIÓN
 # ----------------------------
 RSS_URL = "https://www.boe.es/rss/canal_per.php?l=p&c=140"
-PDF_DIR = Path("python/boe/pdfs")
+PDF_DIR = Path("pdfs")
 PDF_DIR.mkdir(parents=True, exist_ok=True)
 LOG_CSV = Path("python/boe/log_fallos.csv")
 
@@ -27,25 +28,79 @@ db_config = {
     "database": "oposiciones"
 }
 
+# ------------------------------------------------
+# 1) Clasificación y mapeo de números
+# ------------------------------------------------
+
+def classify_convocation(text):
+    tl = text.lower()
+    if any(k in tl for k in ["ayuntamiento de", "diputación", "cabildo", "consell insular", "mancomunidad", "administración local"]):
+        return "municipal"
+    elif any(k in tl for k in ["universidad de", "consorcio", "empresa pública"]):
+        return "otros"
+    elif any(k in tl for k in ["ministerio de", "subsecretaría", "secretaría de estado", "dirección general", "guardia civil", "policía nacional", "cuerpo de"]):
+        return "estatal"
+    else:
+        return "otros"
+
+num_map = {
+    "cero": 0, "uno": 1, "una": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5,
+    # … completa hasta donde necesites …
+    "cien": 100
+}
+
+def word_to_number(w):
+    return num_map.get(w, None)
+
+# ------------------------------------------------
+# 2) Función principal de extracción
+# ------------------------------------------------
+
+def extract_fields(text):
+    tipo = classify_convocation(text)
+    organo = plazas = denominacion = localidad = plazo = ""
+    warnings = []
+
+    if tipo == "municipal":
+        # … tu regex para municipal …
+        pass  # reemplaza con tu implementación
+    elif tipo == "estatal":
+        # … tu regex para estatal …
+        pass
+    else:
+        # … tu regex para otros …
+        pass
+
+    return {
+        "tipo": tipo,
+        "órgano": organo,
+        "número de plazas": plazas,
+        "denominación": denominacion,
+        "localidad/provincia": localidad,
+        "plazo de solicitud": plazo,
+        "warnings": warnings
+    }
+
 # ----------------------------
 # FUNCIONES AUXILIARES
 # ----------------------------
 
-def extraer_fecha_publicacion(text):
+def extraer_texto_div_textoxslt(texto):
     """
-    Extrae la fecha de publicación del texto del BOE en formato YYYY-MM-DD.
+   Extrae el texto dentro del div con id="textoxslt".
+    Retorna el texto plano extraído o cadena vacía si no se encuentra o error.
     """
-    match = re.search(r"\n([A-ZÁÉÍÓÚÑ][^,]+), (\d{1,2}) de (\w+) de (\d{4})", text)
-    if match:
-        dia, mes_texto, anio = match.group(2), match.group(3).lower(), match.group(4)
-        meses = {
-            "enero": "01", "febrero": "02", "marzo": "03", "abril": "04",
-            "mayo": "05", "junio": "06", "julio": "07", "agosto": "08",
-            "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
-        }
-        mes_num = meses.get(mes_texto, "01")
-        return f"{anio}-{mes_num.zfill(2)}-{dia.zfill(2)}"
-    return None
+    try:
+        soup = BeautifulSoup(texto, "html.parser")
+        div = soup.find("div", id="textoxslt")
+        if div:
+            return div.get_text(separator="\n", strip=True)
+        else:
+            print(f"⚠️ No se encontró el div #textoxslt en texto.")
+            return ""
+    except Exception as e:
+        print(f"⚠️ Error analizando texto: {e}")
+        return ""
 
 
 def descargar_pdf(url):
@@ -78,15 +133,17 @@ def leer_pdf(path):
         return ""
 
 
-def descargar_txt(link, boe_id):
+def descargar_html(link, boe_id):
     """
-    Intenta descargar el TXT con la fecha dada.
+    Intenta descargar el HTML con la fecha dada.
     """
     res = requests.get(link)
     texto = res.text if res.status_code == 200 else ""
     if res.status_code == 200 and "boe" in texto.lower() and "disposición" in texto.lower():
-        print(f"📄 Usando TXT para {boe_id}")
-        return texto
+        texto = extraer_texto_div_textoxslt(texto)
+        if texto.strip():
+            print(f"📄 Usando TXT para {boe_id}")
+            return texto
     print(f"❌  TXT vacío o no válido para {boe_id}")
     return ""
 
@@ -114,7 +171,7 @@ def main():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor()
 
-    for entry in feed.entries[0:50]:
+    for entry in feed.entries[0:20]:
         # 1) Extraer BOE ID desde entry.link (txt.php?id=...)
         m = re.search(r"id=(BOE-A-\d{4}-\d+)", entry.link)
         boe_id = m.group(1) if m else None
@@ -128,27 +185,27 @@ def main():
         pdf_url = entry.guid
         fecha = entry.published_parsed
 
-        # 3) Descargar y leer PDF
+        # 3) Descargar y leer HTML
         texto = ""
-        texto = descargar_txt(entry.link, boe_id)
+        texto = descargar_html(entry.link, boe_id)
 
         # 4) Si falta contenido, fallback PDF
-        # if not texto.strip():
-        #     pdf_path = descargar_pdf(pdf_url)
-        #     if pdf_path:
-        #         texto = leer_pdf(pdf_path)
+        if not texto.strip():
+            pdf_path = descargar_pdf(pdf_url)
+            if pdf_path:
+                texto = leer_pdf(pdf_path)
 
         if not texto.strip():
-            print(f"⚠️ {boe_id}: sin contenido legible en PDF ni TXT.")
-            log_error(boe_id, "Sin PDF ni TXT disponible")
+            print(f"⚠️ {boe_id}: sin contenido legible en PDF ni HTML.")
+            log_error(boe_id, "Sin PDF ni HTML disponible")
             continue
 
         # 5) Extraer campos y fecha de publicación
         campos = extract_fields(texto)
-        fecha_publi = extraer_fecha_publicacion(texto) or datetime.today().strftime("%Y-%m-%d")
+        fecha_publi = datetime(*fecha[:6]).strftime("%Y-%m-%d %H:%M:%S") if fecha else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # 6) Preparar datos para DB
-        titulo = f"{campos['órgano']}: {campos['denominación']}".strip(": ")
+        titulo = entry.title
         datos_extra = {
             "órgano": campos['órgano'],
             "plazas": campos['número de plazas'],
@@ -157,6 +214,11 @@ def main():
             "tipo": campos['tipo'],
             "warnings": campos['warnings']
         }
+        for key in list(datos_extra):
+            if not datos_extra[key]:
+                del datos_extra[key]
+            
+            
 
         sql = """
         INSERT INTO CONVOCATORIA

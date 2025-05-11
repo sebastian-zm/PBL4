@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+
+import json
+from datetime import datetime
+import mysql.connector
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+# Configuración conexión BD
+db_config = {
+    'user': 'dev',
+    'password': 'dev',
+    'host': 'db',
+    'database': 'oposiciones',
+}
+
+# Nombre del modelo de embedding en tu tabla MODELO
+NOMBRE_MODELO_EMBEDDING = 'all-MiniLM-L6-v2'  # Ejemplo rápido y pequeño, puedes usar otro
+
+# Cargar modelo local una vez
+model = SentenceTransformer(NOMBRE_MODELO_EMBEDDING)
+
+def get_modelo_id(conn, nombre):
+    cursor = conn.cursor()
+    cursor.execute("SELECT modeloId FROM MODELO WHERE nombre = %s", (nombre,))
+    row = cursor.fetchone()
+    cursor.close()
+    if row:
+        return row[0]
+    else:
+        raise ValueError(f"No se encontró modelo con nombre '{nombre}'")
+
+def obtener_etiquetas_y_embeddings(conn, modeloId):
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT e.etiquetaId, e.nombre, e.descripcion, e.updatedAt AS etiquetaUpdatedAt,
+               me.embedding, me.updatedAt AS embeddingUpdatedAt
+        FROM ETIQUETA e
+        LEFT JOIN MODELO_EMBEDDING me ON me.etiquetaId = e.etiquetaId AND me.modeloId = %s
+    """
+    cursor.execute(query, (modeloId,))
+    resultados = cursor.fetchall()
+    cursor.close()
+    return resultados
+
+def generar_embedding_local(texto):
+    # Devuelve un numpy array de floats
+    return model.encode(texto, convert_to_numpy=True)
+
+def guardar_embedding(conn, modeloId, etiquetaId, embedding):
+    cursor = conn.cursor()
+    # Convertir numpy array a lista para JSON serialization
+    embedding_list = embedding.tolist()
+    embedding_json = json.dumps(embedding_list)
+
+    query = """
+    INSERT INTO MODELO_EMBEDDING (modeloId, etiquetaId, embedding)
+    VALUES (%s, %s, %s)
+    ON DUPLICATE KEY UPDATE embedding = %s
+    """
+    cursor.execute(query, (modeloId, etiquetaId, embedding_json, embedding_json))
+    conn.commit()
+    cursor.close()
+
+def main():
+    conn = mysql.connector.connect(**db_config)
+    modeloId = get_modelo_id(conn, NOMBRE_MODELO_EMBEDDING)
+    etiquetas = obtener_etiquetas_y_embeddings(conn, modeloId)
+
+    actualizados = 0
+    saltados = 0
+
+    for e in etiquetas:
+        etiqueta_updated = e['etiquetaUpdatedAt']
+        embedding_updated = e['embeddingUpdatedAt']
+
+        actualizar = False
+        if embedding_updated is None:
+            actualizar = True
+        else:
+            if etiqueta_updated > embedding_updated:
+                actualizar = True
+
+        if actualizar:
+            texto = (e['nombre'] or '') + ' ' + (e['descripcion'] or '')
+            print(f"Generando embedding para etiqueta {e['etiquetaId']}: {texto[:50]}...")
+            try:
+                embedding = generar_embedding_local(f"{texto}")
+                guardar_embedding(conn, modeloId, e['etiquetaId'], embedding)
+                actualizados += 1
+            except Exception as ex:
+                print(f"Error generando/guardando embedding para etiquetaId {e['etiquetaId']}: {ex}")
+        else:
+            saltados += 1
+
+    print(f"Embeddings actualizados: {actualizados}")
+    print(f"Embeddings saltados (actualizados y al día): {saltados}")
+
+    conn.close()
+
+if __name__ == '__main__':
+    main()

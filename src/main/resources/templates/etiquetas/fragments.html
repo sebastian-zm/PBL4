@@ -1,0 +1,58 @@
+<!-- src/main/resources/templates/etiquetas/fragments.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <!-- Fragmento que genera UN <li> completo,
+         recibe por parámetro una variable llamada 'node' -->
+    <li th:fragment="node(node)" 
+        class="mb-1"
+        th:attr="data-id=${node.etiqueta.etiquetaId}"
+        draggable="true"
+        ondragstart="dragStart(event)"
+        ondragover="dragOver(event)"
+        ondrop="drop(event)">
+      
+      <span class="me-2"><i class="fas fa-arrows-alt"></i></span>
+      <span th:text="${node.etiqueta.nombre}">Etiqueta</span>
+      <button class="btn btn-sm btn-primary ms-2" onclick="showEditForm(this)">
+        <i class="fas fa-edit"></i>
+      </button>
+      <button class="btn btn-sm btn-danger ms-1" onclick="deleteNode(this)">
+        <i class="fas fa-trash"></i>
+      </button>
+      <button class="btn btn-sm btn-success ms-1" onclick="showAddChildForm(this)">
+        <i class="fas fa-plus"></i>
+      </button>
+
+      <!-- form editar -->
+      <form class="d-none form-edit mt-1"
+            th:action="@{'/etiquetas/' + ${node.etiqueta.etiquetaId} + '/edit'}"
+            method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <div class="input-group input-group-sm">
+          <input name="nombre" class="form-control" th:value="${node.etiqueta.nombre}">
+          <input name="descripcion" class="form-control" th:value="${node.etiqueta.descripcion}">
+          <button class="btn btn-primary btn-sm"><i class="fas fa-check"></i></button>
+        </div>
+      </form>
+
+      <!-- form añadir hijo -->
+      <form class="d-none form-add-child mt-1"
+            th:action="@{/etiquetas}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" name="parentId" th:value="${node.etiqueta.etiquetaId}"/>
+        <div class="input-group input-group-sm">
+          <input name="nombre" class="form-control" placeholder="Nueva…">
+          <button class="btn btn-success btn-sm"><i class="fas fa-check"></i></button>
+        </div>
+      </form>
+
+      <!-- recursión -->
+      <ul class="list-unstyled ms-4 mt-1">
+        <th:block th:each="child : ${node.children}">
+          <li th:replace="~{etiquetas/fragments :: node (${child})}"></li>
+        </th:block>
+      </ul>      
+    </li>
+  </body>
+</html>

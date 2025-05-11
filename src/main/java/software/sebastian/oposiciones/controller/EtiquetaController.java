@@ -1,61 +1,56 @@
 package software.sebastian.oposiciones.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
 import software.sebastian.oposiciones.service.EtiquetaService;
+import software.sebastian.oposiciones.service.EtiquetaService.TreeNode;
 
 @Controller
 @RequestMapping("/etiquetas")
 public class EtiquetaController {
 
-    private final EtiquetaService service;
-
-    public EtiquetaController(EtiquetaService svc) {
-        this.service = svc;
-    }
+    private final EtiquetaService svc;
+    public EtiquetaController(EtiquetaService svc) { this.svc = svc; }
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("etiquetas", service.findAll());
-        return "etiquetas";
+    public String tree(Model m) {
+        List<TreeNode> forest = svc.getTree();
+        m.addAttribute("forest", forest);
+        return "etiquetas/tree";
     }
 
     @PostMapping
-    public String create(
-        @RequestParam String nombre,
-        @RequestParam(required = false) String descripcion
-    ) {
-        service.create(nombre, descripcion);
+    public String create(@RequestParam String nombre,
+                         @RequestParam(required=false) String descripcion,
+                         @RequestParam(required=false) Integer parentId) {
+        svc.createWithParent(nombre, descripcion, parentId);
         return "redirect:/etiquetas";
     }
 
     @PostMapping("/{id}/edit")
-    public String edit(
-        @PathVariable Integer id,
-        @RequestParam String nombre,
-        @RequestParam(required = false) String descripcion
-    ) {
-        service.update(id, nombre, descripcion);
+    public String edit(@PathVariable Integer id,
+                       @RequestParam String nombre,
+                       @RequestParam(required=false) String descripcion) {
+        svc.update(id, nombre, descripcion);
         return "redirect:/etiquetas";
+    }
+
+    @PostMapping("/{id}/move")
+    @ResponseBody
+    public Map<String,String> move(@PathVariable Integer id,
+            @RequestParam(required=false) Integer parentId) {
+      svc.moveSubtree(id, parentId);
+      return Map.of("status","ok");
     }
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Integer id) {
-        service.delete(id);
-        return "redirect:/etiquetas";
-    }
-
-    @PostMapping("/relacion")
-    public String relacion(
-        @RequestParam Integer parentId,
-        @RequestParam Integer childId
-    ) {
-        service.addRelation(parentId, childId);
+        svc.delete(id);
         return "redirect:/etiquetas";
     }
 }

@@ -1,0 +1,30 @@
+SET @comunidades = ('Andalucía'),
+('Castilla La Mancha'),
+('Extremadura'),
+('Comunidad Valenciana'),
+('Comunidad de Madrid'),
+('Castilla y León'),
+('Aragón'),
+('Cataluña'),
+('Galicia'),
+('Principado de Asturias'),
+('Cantabria'),
+('País Vasco'),
+('Comunidad Foral de Navarra'),
+('Región de Murcia'),
+('La Rioja'),
+('Islas Baleares'),
+('Islas Canarias'),
+('Ceuta'),
+('Melilla');
+
+SET @andalucia = ('Almería'),
+('Cádiz'),
+('Córdoba'),
+('Granada'),
+('Huelva'),
+('Jaén'),
+('Málaga'),
+('Sevilla')
+
+INSERT INTO 
