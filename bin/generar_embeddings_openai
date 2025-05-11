@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+
+import os
+import openai
+import numpy as np
+import mysql.connector
+from lib.embeddings import get_modelo_id, obtener_etiquetas_y_embeddings, guardar_embedding
+from lib.db_config import db_config
+
+# Configura la API Key de OpenAI
+openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# Nombre del modelo en tabla MODELO para este embedding
+NOMBRE_MODELO_EMBEDDING = "text-embedding-3-large"
+
+def generar_embedding_openai(texto):
+    response = openai_client.embeddings.create(
+        input=texto,
+        model=NOMBRE_MODELO_EMBEDDING
+    )
+    return np.array(response.data[0].embedding)
+
+def main():
+    conn = mysql.connector.connect(**db_config)
+    modeloId = get_modelo_id(conn, NOMBRE_MODELO_EMBEDDING)
+    etiquetas = obtener_etiquetas_y_embeddings(conn, modeloId)
+
+    actualizados = 0
+    saltados = 0
+
+    for e in etiquetas:
+        etiqueta_updated = e['etiquetaUpdatedAt']
+        embedding_updated = e['embeddingUpdatedAt']
+        actualizar = False
+        if embedding_updated is None or etiqueta_updated > embedding_updated:
+            actualizar = True
+
+        if actualizar:
+            texto = (e['nombre'] or '') + ' ' + (e['descripcion'] or '')
+            print(f"Generando embedding para etiqueta {e['etiquetaId']}: {texto[:50]}...")
+            try:
+                embedding = generar_embedding_openai(texto)
+                guardar_embedding(conn, modeloId, e['etiquetaId'], embedding)
+                actualizados += 1
+            except Exception as ex:
+                print(f"Error generando/guardando embedding para etiquetaId {e['etiquetaId']}: {ex}")
+        else:
+            saltados += 1
+
+    print(f"Embeddings actualizados: {actualizados}")
+    print(f"Embeddings saltados (actualizados y al día): {saltados}")
+    conn.close()
+
+if __name__ == '__main__':
+    main()

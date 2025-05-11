@@ -1,21 +1,43 @@
-import sys
 import json
-import mysql.connector
 import numpy as np
-from sentence_transformers import SentenceTransformer
 
-# Configuraciones - AJUSTA según tu entorno
-db_config = {
-    'user': 'tu_usuario',
-    'password': 'tu_password',
-    'host': 'localhost',
-    'database': 'tu_base_datos',
-}
+def get_modelo_id(conn, nombre):
+    cursor = conn.cursor()
+    cursor.execute("SELECT modeloId FROM MODELO WHERE nombre = %s", (nombre,))
+    row = cursor.fetchone()
+    cursor.close()
+    if row:
+        return row[0]
+    else:
+        raise ValueError(f"No se encontró modelo con nombre '{nombre}'")
 
-NOMBRE_MODELO_EMBEDDING = "local-sentence-transformers"
-UMBRAL_SIMILITUD = 0.7
+def obtener_etiquetas_y_embeddings(conn, modeloId):
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT e.etiquetaId, e.nombre, e.descripcion, e.updatedAt AS etiquetaUpdatedAt,
+               me.embedding, me.updatedAt AS embeddingUpdatedAt
+        FROM ETIQUETA e
+        LEFT JOIN MODELO_EMBEDDING me ON me.etiquetaId = e.etiquetaId AND me.modeloId = %s
+    """
+    cursor.execute(query, (modeloId,))
+    resultados = cursor.fetchall()
+    cursor.close()
+    return resultados
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+def guardar_embedding(conn, modeloId, etiquetaId, embedding):
+    cursor = conn.cursor()
+    # Convertir numpy array a lista para JSON serialization
+    embedding_list = embedding.tolist()
+    embedding_json = json.dumps(embedding_list)
+
+    query = """
+    INSERT INTO MODELO_EMBEDDING (modeloId, etiquetaId, embedding)
+    VALUES (%s, %s, %s)
+    ON DUPLICATE KEY UPDATE embedding = %s
+    """
+    cursor.execute(query, (modeloId, etiquetaId, embedding_json, embedding_json))
+    conn.commit()
+    cursor.close()
 
 def get_modelo_id(conn, nombre):
     cursor = conn.cursor()
@@ -73,51 +95,3 @@ def insertar_actualizar_etiquetado(conn, convocatoriaId, etiquetaId, modeloId, c
     """
     cursor.execute(query, (convocatoriaId, etiquetaId, modeloId, confianza, confianza))
     cursor.close()
-
-def main():
-    if len(sys.argv) < 2:
-        print("Uso: python script.py <convocatoriaId>")
-        sys.exit(1)
-
-    convocatoriaId = sys.argv[1]
-
-    try:
-        conn = mysql.connector.connect(**db_config)
-        modeloId = get_modelo_id(conn, NOMBRE_MODELO_EMBEDDING)
-        etiquetas, embeddings_etiquetas = cargar_embeddings_etiquetas(conn, modeloId)
-
-        if len(etiquetas) == 0:
-            print(f"No hay embeddings de etiquetas para el modelo {NOMBRE_MODELO_EMBEDDING}")
-            sys.exit(1)
-
-        convocatoria = cargar_convocatoria(conn, convocatoriaId)
-        texto_concat = (convocatoria['titulo'] or '') + ' ' + (convocatoria['texto'] or '')
-        emb_conv = model.encode(texto_concat, convert_to_numpy=True)
-
-        sims = similaridad_coseno(emb_conv, embeddings_etiquetas)
-        indices_relevantes = np.where(sims >= UMBRAL_SIMILITUD)[0]
-
-        if len(indices_relevantes) == 0:
-            # No se encontraron etiquetas relevantes
-            sys.exit(1)
-
-        for idx in indices_relevantes:
-            etiquetaId = etiquetas[idx]
-            confianza = float(sims[idx])
-            insertar_actualizar_etiquetado(conn, convocatoriaId, etiquetaId, modeloId, confianza)
-
-        conn.commit()
-        sys.exit(0)
-
-    except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
-
-    finally:
-        try:
-            conn.close()
-        except:
-            pass
-
-if __name__ == '__main__':
-    main()

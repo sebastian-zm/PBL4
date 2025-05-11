@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import mysql.connector
+import numpy as np
+import openai
+import tiktoken
+from lib.db_config import db_config
+from lib.embeddings import get_modelo_id, similaridad_coseno, cargar_convocatoria, insertar_actualizar_etiquetado, cargar_embeddings_etiquetas
+
+# Nombre del modelo de embedding en tu tabla MODELO
+NOMBRE_MODELO_EMBEDDING = 'text-embedding-3-large'  # Ejemplo rápido y pequeño, puedes usar otro
+
+UMBRAL_SIMILITUD = 0.4
+
+openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+
+def truncate_text_to_str(text, max_tokens=8191):
+    encoding = tiktoken.encoding_for_model(NOMBRE_MODELO_EMBEDDING)
+    tokens = encoding.encode(text)[:max_tokens]
+    truncated_text = encoding.decode(tokens)
+    return truncated_text
+
+def get_openai_embedding(text, model):
+    response = openai_client.embeddings.create(
+        input=text,
+        model=model
+    )
+    return np.array(response.data[0].embedding, dtype=np.float32)
+
+def main():
+    if len(sys.argv) < 2:
+        print("Uso: python script.py <convocatoriaId>")
+        sys.exit(1)
+
+    convocatoriaId = sys.argv[1]
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        modeloId = get_modelo_id(conn, NOMBRE_MODELO_EMBEDDING)
+        etiquetas, embeddings_etiquetas = cargar_embeddings_etiquetas(conn, modeloId)
+
+        if len(etiquetas) == 0:
+            print(f"No hay embeddings de etiquetas para el modelo {NOMBRE_MODELO_EMBEDDING}")
+            sys.exit(1)
+
+        convocatoria = cargar_convocatoria(conn, convocatoriaId)
+        texto_concat = (convocatoria['titulo'] or '') + ' ' + (convocatoria['texto'] or '')
+
+        texto_truncado = truncate_text_to_str(texto_concat, max_tokens=8190)
+        emb_conv = get_openai_embedding(texto_truncado, model=NOMBRE_MODELO_EMBEDDING)
+
+        sims = similaridad_coseno(emb_conv, embeddings_etiquetas)
+        print(sims, etiquetas)
+        indices_relevantes = np.where(sims >= UMBRAL_SIMILITUD)[0]
+
+        if len(indices_relevantes) == 0:
+            # No se encontraron etiquetas relevantes
+            sys.exit(1)
+
+        for idx in indices_relevantes:
+            etiquetaId = etiquetas[idx]
+            confianza = float(sims[idx])
+            insertar_actualizar_etiquetado(conn, convocatoriaId, etiquetaId, modeloId, confianza)
+
+        conn.commit()
+        sys.exit(0)
+
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    finally:
+        try:
+            conn.close()
+        except:
+            pass
+
+if __name__ == '__main__':
+    main()

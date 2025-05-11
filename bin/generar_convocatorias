@@ -5,12 +5,12 @@ import feedparser
 import pdfplumber
 import json
 import re
-import urllib.parse
 from datetime import datetime
 from pathlib import Path
 import mysql.connector
 import csv
 from bs4 import BeautifulSoup
+from lib.db_config import db_config
 
 # ----------------------------
 # CONFIGURACIÓN
@@ -19,14 +19,6 @@ RSS_URL = "https://www.boe.es/rss/canal_per.php?l=p&c=140"
 PDF_DIR = Path("pdfs")
 PDF_DIR.mkdir(parents=True, exist_ok=True)
 LOG_CSV = Path("python/boe/log_fallos.csv")
-
-# Configuración de la base de datos MySQL
-db_config = {
-    "host": "db",
-    "user": "dev",
-    "password": "dev",
-    "database": "oposiciones"
-}
 
 # ------------------------------------------------
 # 1) Clasificación y mapeo de números
