@@ -30,7 +30,7 @@ public class ModeloEmbedding {
      * JSON del vector de embedding en bytes (LONGBLOB)
      */
     @Lob
-    @Column(name = "embedding", nullable = false)
+    @Column(name = "embedding", columnDefinition = "LONGBLOB", nullable = false)
     private byte[] embeddingBlob;
 
     @CreationTimestamp
