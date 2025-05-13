@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import groovyjarjarantlr4.v4.parse.ANTLRParser.finallyClause_return;
 import software.sebastian.oposiciones.model.ArbolEtiqueta;
 import software.sebastian.oposiciones.model.Etiqueta;
 import software.sebastian.oposiciones.repository.ArbolEtiquetaRepository;
@@ -20,23 +21,29 @@ import software.sebastian.oposiciones.repository.EtiquetaRepository;
 public class EtiquetaService {
     private final EtiquetaRepository etiquetaRepo;
     private final ArbolEtiquetaRepository arbolRepo;
+    private final EtiquetaEmbeddingService etiquetaEmbeddingService;
 
-    public EtiquetaService(EtiquetaRepository er, ArbolEtiquetaRepository ar) {
+    public EtiquetaService(EtiquetaRepository er, ArbolEtiquetaRepository ar,
+            EtiquetaEmbeddingService etiquetaEmbeddingService) {
         this.etiquetaRepo = er;
         this.arbolRepo = ar;
+        this.etiquetaEmbeddingService = etiquetaEmbeddingService;
     }
 
     public List<Etiqueta> findAll() {
         return etiquetaRepo.findAll();
     }
 
-    @Transactional
     public Etiqueta create(String nombre, String descripcion) {
         Etiqueta e = new Etiqueta();
         e.setNombre(nombre);
         e.setDescripcion(descripcion);
         Etiqueta eSaved = etiquetaRepo.save(e);
         arbolRepo.save(new ArbolEtiqueta(eSaved, eSaved, 0));
+
+        // Generar embedding asincrónicamente si quieres, o síncrono aquí
+        etiquetaEmbeddingService.generarYGuardarEmbedding(eSaved.getEtiquetaId());
+
         return eSaved;
     }
 
@@ -56,10 +63,15 @@ public class EtiquetaService {
 
     public Etiqueta update(Integer id, String nombre, String descripcion) {
         Etiqueta e = etiquetaRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No existe: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("No existe etiqueta: " + id));
         e.setNombre(nombre);
         e.setDescripcion(descripcion);
-        return etiquetaRepo.save(e);
+        Etiqueta saved = etiquetaRepo.save(e);
+
+        // Actualizar embedding
+        etiquetaEmbeddingService.generarYGuardarEmbedding(saved.getEtiquetaId());
+
+        return saved;
     }
 
     /**
