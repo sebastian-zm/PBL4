@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.sebastian.oposiciones.model.Convocatoria;
 import software.sebastian.oposiciones.repository.ConvocatoriaRepository;
-import software.sebastian.oposiciones.service.TaggingService;
 
 @Service
 public class ConvocatoriaService {

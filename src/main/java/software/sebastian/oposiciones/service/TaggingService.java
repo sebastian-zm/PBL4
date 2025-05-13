@@ -28,17 +28,20 @@ public class TaggingService {
     private final EtiquetadoRepository etiquetadoRepo;
     private final ModeloRepository modeloRepo;
     private final ModeloEmbeddingService modeloEmbeddingService;
+    private final TokenizerPythonCaller tokenizerPythonCaller;
 
     public TaggingService(OpenAIClient openAIClient,
                           ConvocatoriaRepository convocatoriaRepo,
                           EtiquetadoRepository etiquetadoRepo,
                           ModeloRepository modeloRepo,
-                          ModeloEmbeddingService modeloEmbeddingService) {
+                          ModeloEmbeddingService modeloEmbeddingService,
+                          TokenizerPythonCaller tokenizerPythonCaller) {
         this.openAIClient = openAIClient;
         this.convocatoriaRepo = convocatoriaRepo;
         this.etiquetadoRepo = etiquetadoRepo;
         this.modeloRepo = modeloRepo;
         this.modeloEmbeddingService = modeloEmbeddingService;
+        this.tokenizerPythonCaller = tokenizerPythonCaller;
     }
 
     @Async("taggingExecutor")
@@ -49,45 +52,50 @@ public class TaggingService {
     }
 
     private void tagConvocatoria(Integer convocatoriaId) {
-        // 1) Recuperar la convocatoria
-        Convocatoria c = convocatoriaRepo.findById(convocatoriaId)
-            .orElseThrow(() -> new IllegalArgumentException("No existe convocatoria " + convocatoriaId));
+        try {
+            // 1) Recuperar la convocatoria
+            Convocatoria c = convocatoriaRepo.findById(convocatoriaId)
+                .orElseThrow(() -> new IllegalArgumentException("No existe convocatoria " + convocatoriaId));
 
-        // 2) Construir el texto y truncar
-        String texto = c.getTitulo() + " " + c.getTexto();
-        String truncated = texto.length() <= 10000 ? texto : texto.substring(0, 10000);
+            // 2) Construir el texto y truncar usando Python para tokens
+            String texto = c.getTitulo() + " " + c.getTexto();
+            String truncated = tokenizerPythonCaller.truncarTextoPorTokens(EMBEDDING_MODEL, 5000, texto);
 
-        // 3) Obtener el embedding de la convocatoria
-        CreateEmbeddingResponse resp = openAIClient.embeddings().create(
-            EmbeddingCreateParams.builder()
-                .model(EMBEDDING_MODEL)
-                .input(truncated)
-                .build()
-        );
-        double[] embConv = resp.data().get(0).embedding()
-                              .stream().mapToDouble(Double::doubleValue).toArray();
+            // 3) Obtener el embedding de la convocatoria
+            CreateEmbeddingResponse resp = openAIClient.embeddings().create(
+                EmbeddingCreateParams.builder()
+                    .model(EMBEDDING_MODEL)
+                    .input(truncated)
+                    .build()
+            );
+            double[] embConv = resp.data().get(0).embedding()
+                                          .stream().mapToDouble(Double::doubleValue).toArray();
 
-        // 4) Averiguar el modeloId en la tabla MODELO
-        Integer modeloId = modeloRepo.findByNombre(EMBEDDING_MODEL)
-            .orElseThrow(() -> new IllegalStateException("Modelo no encontrado"))
-            .getModeloId();
+            // 4) Averiguar el modeloId en la tabla MODELO
+            Integer modeloId = modeloRepo.findByNombre(EMBEDDING_MODEL)
+                .orElseThrow(() -> new IllegalStateException("Modelo no encontrado"))
+                .getModeloId();
 
-        // 5) Cargar todos los embeddings de etiquetas para ese modelo
-        Map<Integer,double[]> embeddingsPorEtiqueta =
-            modeloEmbeddingService.cargarEmbeddingsPorModelo(modeloId);
+            // 5) Cargar todos los embeddings de etiquetas para ese modelo
+            Map<Integer,double[]> embeddingsPorEtiqueta =
+                modeloEmbeddingService.cargarEmbeddingsPorModelo(modeloId);
 
-        // 6) Por cada etiqueta, calcular similitud y persistir en ETIQUETADO si supera umbral
-        embeddingsPorEtiqueta.forEach((etiquetaId, embLabel) -> {
-            double sim = cosineSimilarity(embConv, embLabel);
-            if (sim >= UMBRAL) {
-                Etiquetado et = new Etiquetado(convocatoriaId,
-                                               etiquetaId,
-                                               modeloId,
-                                               null,      // valoración (puede quedar a null)
-                                               sim);
-                etiquetadoRepo.save(et);
-            }
-        });
+            // 6) Por cada etiqueta, calcular similitud y persistir en ETIQUETADO si supera umbral
+            embeddingsPorEtiqueta.forEach((etiquetaId, embLabel) -> {
+                double sim = cosineSimilarity(embConv, embLabel);
+                if (sim >= UMBRAL) {
+                    Etiquetado et = new Etiquetado(convocatoriaId,
+                                                   etiquetaId,
+                                                   modeloId,
+                                                   null,      // valoración (puede quedar a null)
+                                                   sim);
+                    etiquetadoRepo.save(et);
+                }
+            });
+           
+        } catch (Exception e) {
+            throw new RuntimeException("Error en tagConvocatoria: " + e.getMessage(), e);
+        }
     }
 
     private double cosineSimilarity(double[] a, double[] b) {

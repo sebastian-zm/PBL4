@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title">Convocatorias BOE</title>
+    <th:block layout:fragment="headExtras">
+        <!-- Puedes añadir CSS adicional aquí -->
+    </th:block>
+</head>
+<body>
+<main class="container my-4" role="main" layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1><i class="fas fa-bell me-2"></i>Convocatorias BOE</h1>
+        <a class="btn btn-primary" th:href="@{/convocatorias/nueva}"><i class="fas fa-plus me-1"></i>Agregar</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">BOE ID</th>
+                    <th scope="col">Título</th>
+                    <th scope="col">Enlace</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="c : ${convocatorias}">
+                    <td th:text="${c.fechaPublicacion.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy'))}"></td>
+                    <td th:text="${c.boeId}"></td>
+                    <td th:text="${c.titulo}"></td>
+                    <td>
+                        <a th:href="${c.enlace}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-file-pdf me-1"></i>Ver
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<th:block layout:fragment="scriptExtras">
+    <!-- Scripts adicionales si son necesarios -->
+</th:block>
+</body>
+</html>
