@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import groovyjarjarantlr4.v4.parse.ANTLRParser.finallyClause_return;
 import software.sebastian.oposiciones.model.ArbolEtiqueta;
 import software.sebastian.oposiciones.model.Etiqueta;
 import software.sebastian.oposiciones.repository.ArbolEtiquetaRepository;
@@ -34,10 +33,10 @@ public class EtiquetaService {
         return etiquetaRepo.findAll();
     }
 
-    public Etiqueta create(String nombre, String descripcion) {
+    public Etiqueta create(String nombre, String formato) {
         Etiqueta e = new Etiqueta();
         e.setNombre(nombre);
-        e.setDescripcion(descripcion);
+        e.setFormato(formato);
         Etiqueta eSaved = etiquetaRepo.save(e);
         arbolRepo.save(new ArbolEtiqueta(eSaved, eSaved, 0));
 
@@ -61,11 +60,11 @@ public class EtiquetaService {
         arbolRepo.bulkReparent(nodeId, parentId);
     }
 
-    public Etiqueta update(Integer id, String nombre, String descripcion) {
+    public Etiqueta update(Integer id, String nombre, String formato) {
         Etiqueta e = etiquetaRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No existe etiqueta: " + id));
         e.setNombre(nombre);
-        e.setDescripcion(descripcion);
+        e.setFormato(formato);
         Etiqueta saved = etiquetaRepo.save(e);
 
         // Actualizar embedding

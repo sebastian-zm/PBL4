@@ -8,40 +8,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import software.sebastian.oposiciones.model.Etiquetado;
-import software.sebastian.oposiciones.model.Convocatoria;
-import software.sebastian.oposiciones.repository.ConvocatoriaRepository;
 import software.sebastian.oposiciones.repository.EtiquetadoRepository;
 import software.sebastian.oposiciones.repository.ModeloRepository;
 
-import com.openai.client.OpenAIClient;
-import com.openai.models.embeddings.CreateEmbeddingResponse;
-import com.openai.models.embeddings.EmbeddingCreateParams;
 
 @Service
-public class TaggingService {
+public class EtiquetadoService {
 
     private static final String EMBEDDING_MODEL = "text-embedding-3-large";
     private static final double UMBRAL = 0.4;
 
-    private final OpenAIClient openAIClient;
-    private final ConvocatoriaRepository convocatoriaRepo;
     private final EtiquetadoRepository etiquetadoRepo;
     private final ModeloRepository modeloRepo;
-    private final ModeloEmbeddingService modeloEmbeddingService;
-    private final TokenizerPythonCaller tokenizerPythonCaller;
+    private final EtiquetaEmbeddingService etiquetaEmbeddingService;
+    private final ConvocatoriaEmbeddingService convocatoriaEmbeddingService;
 
-    public TaggingService(OpenAIClient openAIClient,
-                          ConvocatoriaRepository convocatoriaRepo,
-                          EtiquetadoRepository etiquetadoRepo,
+    public EtiquetadoService(EtiquetadoRepository etiquetadoRepo,
                           ModeloRepository modeloRepo,
-                          ModeloEmbeddingService modeloEmbeddingService,
-                          TokenizerPythonCaller tokenizerPythonCaller) {
-        this.openAIClient = openAIClient;
-        this.convocatoriaRepo = convocatoriaRepo;
+                          EtiquetaEmbeddingService etiquetaEmbeddingService,
+                          ConvocatoriaEmbeddingService convocatoriaEmbeddingService) {
         this.etiquetadoRepo = etiquetadoRepo;
         this.modeloRepo = modeloRepo;
-        this.modeloEmbeddingService = modeloEmbeddingService;
-        this.tokenizerPythonCaller = tokenizerPythonCaller;
+        this.convocatoriaEmbeddingService = convocatoriaEmbeddingService;
+        this.etiquetaEmbeddingService = etiquetaEmbeddingService;
     }
 
     @Async("taggingExecutor")
@@ -53,34 +42,19 @@ public class TaggingService {
 
     private void tagConvocatoria(Integer convocatoriaId) {
         try {
-            // 1) Recuperar la convocatoria
-            Convocatoria c = convocatoriaRepo.findById(convocatoriaId)
-                .orElseThrow(() -> new IllegalArgumentException("No existe convocatoria " + convocatoriaId));
-
-            // 2) Construir el texto y truncar usando Python para tokens
-            String texto = c.getTitulo() + " " + c.getTexto();
-            String truncated = tokenizerPythonCaller.truncarTextoPorTokens(EMBEDDING_MODEL, 5000, texto);
-
-            // 3) Obtener el embedding de la convocatoria
-            CreateEmbeddingResponse resp = openAIClient.embeddings().create(
-                EmbeddingCreateParams.builder()
-                    .model(EMBEDDING_MODEL)
-                    .input(truncated)
-                    .build()
-            );
-            double[] embConv = resp.data().get(0).embedding()
-                                          .stream().mapToDouble(Double::doubleValue).toArray();
-
-            // 4) Averiguar el modeloId en la tabla MODELO
+            // Obtener el embedding de la convocatoria usando el servicio especializado
+            double[] embConv = convocatoriaEmbeddingService.generarYGuardarEmbedding(convocatoriaId);
+    
+            // Averiguar el modeloId en la tabla MODELO
             Integer modeloId = modeloRepo.findByNombre(EMBEDDING_MODEL)
                 .orElseThrow(() -> new IllegalStateException("Modelo no encontrado"))
                 .getModeloId();
 
-            // 5) Cargar todos los embeddings de etiquetas para ese modelo
+            // Cargar todos los embeddings de etiquetas para ese modelo
             Map<Integer,double[]> embeddingsPorEtiqueta =
-                modeloEmbeddingService.cargarEmbeddingsPorModelo(modeloId);
+                etiquetaEmbeddingService.cargarEmbeddingsPorModelo(modeloId);
 
-            // 6) Por cada etiqueta, calcular similitud y persistir en ETIQUETADO si supera umbral
+            // Por cada etiqueta, calcular similitud y persistir en ETIQUETADO si supera umbral
             embeddingsPorEtiqueta.forEach((etiquetaId, embLabel) -> {
                 double sim = cosineSimilarity(embConv, embLabel);
                 if (sim >= UMBRAL) {

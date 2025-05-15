@@ -1,8 +1,6 @@
 package software.sebastian.oposiciones.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -12,6 +10,7 @@ import java.util.Objects;
 /**
  * Entidad para la tabla MODELO_EMBEDDING.
  * Guarda el embedding JSON (como LONGBLOB) y gestiona su serialización/deserialización.
+ * Ahora soporta entidad polimórfica con entidadId y entidadTipo.
  */
 @Entity
 @Table(name = "MODELO_EMBEDDING")
@@ -24,7 +23,11 @@ public class ModeloEmbedding {
 
     @Id
     @Column(nullable = false)
-    private Integer etiquetaId;
+    private Integer entidadId;
+
+    @Id
+    @Column(nullable = false, length = 50)
+    private String entidadTipo;
 
     /**
      * JSON del vector de embedding en bytes (LONGBLOB)
@@ -33,11 +36,9 @@ public class ModeloEmbedding {
     @Column(name = "embedding", columnDefinition = "LONGBLOB", nullable = false)
     private byte[] embeddingBlob;
 
-    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
@@ -46,9 +47,10 @@ public class ModeloEmbedding {
     public ModeloEmbedding() {
     }
 
-    public ModeloEmbedding(Integer modeloId, Integer etiquetaId, double[] embedding) {
+    public ModeloEmbedding(Integer modeloId, Integer entidadId, String entidadTipo, double[] embedding) {
         this.modeloId = modeloId;
-        this.etiquetaId = etiquetaId;
+        this.entidadId = entidadId;
+        this.entidadTipo = entidadTipo;
         setEmbedding(embedding);
     }
 
@@ -60,12 +62,20 @@ public class ModeloEmbedding {
         this.modeloId = modeloId;
     }
 
-    public Integer getEtiquetaId() {
-        return etiquetaId;
+    public Integer getEntidadId() {
+        return entidadId;
     }
 
-    public void setEtiquetaId(Integer etiquetaId) {
-        this.etiquetaId = etiquetaId;
+    public void setEntidadId(Integer entidadId) {
+        this.entidadId = entidadId;
+    }
+
+    public String getEntidadTipo() {
+        return entidadTipo;
+    }
+
+    public void setEntidadTipo(String entidadTipo) {
+        this.entidadTipo = entidadTipo;
     }
 
     /**
@@ -112,14 +122,16 @@ public class ModeloEmbedding {
      */
     public static class PrimaryKey implements Serializable {
         private Integer modeloId;
-        private Integer etiquetaId;
+        private Integer entidadId;
+        private String entidadTipo;
 
         public PrimaryKey() {
         }
 
-        public PrimaryKey(Integer modeloId, Integer etiquetaId) {
+        public PrimaryKey(Integer modeloId, Integer entidadId, String entidadTipo) {
             this.modeloId = modeloId;
-            this.etiquetaId = etiquetaId;
+            this.entidadId = entidadId;
+            this.entidadTipo = entidadTipo;
         }
 
         @Override
@@ -128,12 +140,13 @@ public class ModeloEmbedding {
             if (!(o instanceof PrimaryKey)) return false;
             PrimaryKey that = (PrimaryKey) o;
             return Objects.equals(modeloId, that.modeloId) &&
-                   Objects.equals(etiquetaId, that.etiquetaId);
+                   Objects.equals(entidadId, that.entidadId) &&
+                   Objects.equals(entidadTipo, that.entidadTipo);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(modeloId, etiquetaId);
+            return Objects.hash(modeloId, entidadId, entidadTipo);
         }
     }
 }

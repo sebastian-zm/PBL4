@@ -3,6 +3,10 @@ package software.sebastian.oposiciones.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import jakarta.persistence.Column;
+
 @Entity
 @Table(name = "CONVOCATORIA")
 public class Convocatoria {
@@ -25,6 +29,14 @@ public class Convocatoria {
 
     @Column(nullable = false)
     private String enlace;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
     public Convocatoria() {
     }
@@ -70,8 +82,16 @@ public class Convocatoria {
     }
 
     public String getEnlace() {
-        return enlace;
-    }
+    return enlace;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
 
     public void setEnlace(String enlace) {
         this.enlace = enlace;

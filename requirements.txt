@@ -9,5 +9,4 @@ feedparser
 pdfplumber
 mysql-connector-python
 dotenv
-sentence-transformers
 beautifulsoup4

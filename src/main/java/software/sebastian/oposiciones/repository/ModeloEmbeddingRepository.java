@@ -10,4 +10,6 @@ import software.sebastian.oposiciones.model.ModeloEmbedding;
 public interface ModeloEmbeddingRepository
         extends JpaRepository<ModeloEmbedding, ModeloEmbedding.PrimaryKey> {
     List<ModeloEmbedding> findByModeloId(Integer modeloId);
+
+    List<ModeloEmbedding> findByModeloIdAndEntidadTipo(Integer modeloId, String entidadTipo);
 }

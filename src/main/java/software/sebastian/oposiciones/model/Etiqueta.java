@@ -25,7 +25,9 @@ public class Etiqueta {
     @Column(nullable = false, unique = true)
     private String nombre;
 
-    private String descripcion;
+    // Se usa para formatear el nombre en embeddings
+    @Column
+    private String formato; // Formato para el nombre de la etiqueta en embeddings
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -49,8 +51,8 @@ public class Etiqueta {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public String getFormato() { return formato; }
+    public void setFormato(String formato) { this.formato = formato; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

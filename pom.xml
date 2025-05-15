@@ -102,14 +102,9 @@
       <version>6.7.2</version>
     </dependency>
     <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>hotwired__stimulus</artifactId>
-      <version>3.2.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>hotwired__turbo</artifactId>
-      <version>8.0.13</version>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <!-- Flyway for DB migrations -->

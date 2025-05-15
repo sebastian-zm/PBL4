@@ -10,11 +10,11 @@ import software.sebastian.oposiciones.repository.ConvocatoriaRepository;
 public class ConvocatoriaService {
 
     private final ConvocatoriaRepository convocatoriaRepo;
-    private final TaggingService taggingService;
+    private final EtiquetadoService taggingService;
 
     public ConvocatoriaService(
             ConvocatoriaRepository convocatoriaRepo,
-            TaggingService taggingService) {
+            EtiquetadoService taggingService) {
         this.convocatoriaRepo = convocatoriaRepo;
         this.taggingService = taggingService;
     }

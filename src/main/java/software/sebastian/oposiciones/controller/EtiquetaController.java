@@ -26,17 +26,17 @@ public class EtiquetaController {
 
     @PostMapping
     public String create(@RequestParam String nombre,
-                         @RequestParam(required=false) String descripcion,
+                         @RequestParam(required=false) String formato,
                          @RequestParam(required=false) Integer parentId) {
-        svc.createWithParent(nombre, descripcion, parentId);
+        svc.createWithParent(nombre, formato, parentId);
         return "redirect:/etiquetas";
     }
 
     @PostMapping("/{id}/edit")
     public String edit(@PathVariable Integer id,
                        @RequestParam String nombre,
-                       @RequestParam(required=false) String descripcion) {
-        svc.update(id, nombre, descripcion);
+                       @RequestParam(required=false) String formato) {
+        svc.update(id, nombre, formato);
         return "redirect:/etiquetas";
     }
 
