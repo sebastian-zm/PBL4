@@ -163,7 +163,7 @@ def main():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor()
 
-    for entry in feed.entries[0:20]:
+    for entry in feed.entries:
         # 1) Extraer BOE ID desde entry.link (txt.php?id=...)
         m = re.search(r"id=(BOE-A-\d{4}-\d+)", entry.link)
         boe_id = m.group(1) if m else None

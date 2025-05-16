@@ -50,9 +50,11 @@ public abstract class ModeloEmbeddingService<E> {
   double[] generarYGuardarEmbedding(Integer id) {
     E entity = loadEntity(id);
     String input = buildInput(entity).trim();
-    if (input == null || input.isEmpty()) {
+    if (input == null || input.trim().isEmpty()) {
       throw new IllegalStateException("Sin input para el embedding: " + entityType + id);
     }
+
+    System.out.println(input);
 
     // Obtener modeloId
     Integer modeloId = modeloRepo.findByNombre(EMBEDDING_MODEL)

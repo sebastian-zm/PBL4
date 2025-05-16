@@ -23,6 +23,7 @@ public class EtiquetaEmbeddingService extends ModeloEmbeddingService<Etiqueta> {
                                   EtiquetaRepository etiquetaRepo) {
     super(openAIClient, modeloRepo, modeloEmbeddingRepo);
     this.etiquetaRepo = etiquetaRepo;
+    entityType = "ETIQUETA";
   }
 
   @Override
@@ -41,7 +42,7 @@ public class EtiquetaEmbeddingService extends ModeloEmbeddingService<Etiqueta> {
     return etiqueta.getUpdatedAt();
   }
 
-  public String entityType = "ETIQUETA";
+  
 
   @Override
   public String buildInput(Etiqueta etiqueta) {

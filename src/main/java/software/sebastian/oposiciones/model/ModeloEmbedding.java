@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 /**
  * Entidad para la tabla MODELO_EMBEDDING.
@@ -36,10 +38,12 @@ public class ModeloEmbedding {
     @Column(name = "embedding", columnDefinition = "LONGBLOB", nullable = false)
     private byte[] embeddingBlob;
 
+
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();

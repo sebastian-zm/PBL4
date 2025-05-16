@@ -1,5 +1,5 @@
 -- Flyway migration script
--- Created: Wed May 15 00:00:00 UTC 2025
+-- Created: Wed May 15 00:00:01 UTC 2025
 
 -- 1. Añadir columnas para tabla polimórfica
 ALTER TABLE MODELO_EMBEDDING
@@ -9,11 +9,11 @@ ALTER TABLE MODELO_EMBEDDING
 -- 2. Copiar valores de etiquetaId a entidadId y poner entidadTipo='ETIQUETA'
 UPDATE MODELO_EMBEDDING
 SET entidadId = etiquetaId,
-    entidadTipo = 'ETIQUETA';
+    entidadTipo = 'ETIQUETA'; 
 
 -- 3. Quitar foreign key a ETIQUETA si existiera (no se detectó en consulta)
 -- (Si hay foreign key explícita, descomenta y ajusta el nombre)
--- ALTER TABLE MODELO_EMBEDDING DROP FOREIGN KEY fk_modelo_embedding_etiqueta;
+ALTER TABLE MODELO_EMBEDDING DROP FOREIGN KEY MODELO_EMBEDDING_ibfk_2;
 
 -- 4. Eliminar columna etiquetaId
 ALTER TABLE MODELO_EMBEDDING

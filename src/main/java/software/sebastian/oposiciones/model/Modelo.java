@@ -9,6 +9,8 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "MODELO")
@@ -21,10 +23,12 @@ public class Modelo {
     @Column(nullable = false, unique = true)
     private String nombre;
 
+
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     public Modelo() {

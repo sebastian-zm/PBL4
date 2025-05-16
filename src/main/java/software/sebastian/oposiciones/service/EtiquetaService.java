@@ -36,6 +36,9 @@ public class EtiquetaService {
     public Etiqueta create(String nombre, String formato) {
         Etiqueta e = new Etiqueta();
         e.setNombre(nombre);
+        if (formato == null || formato.trim().isEmpty()) {
+            formato = "Convocatorias de oposiciones y anuncios relevantes a %s";
+        }
         e.setFormato(formato);
         Etiqueta eSaved = etiquetaRepo.save(e);
         arbolRepo.save(new ArbolEtiqueta(eSaved, eSaved, 0));

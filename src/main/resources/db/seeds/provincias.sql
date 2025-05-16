@@ -1,3 +1,4 @@
+USE oposiciones;
 CALL insertar_etiquetas('{
   "Andalucía": ["Almería", "Cádiz", "Córdoba", "Granada", "Huelva", "Jaén", "Málaga", "Sevilla"],
   "Aragón": ["Huesca", "Teruel", "Zaragoza"],

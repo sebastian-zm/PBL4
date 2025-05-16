@@ -43,7 +43,9 @@ public class SecurityConfig {
         http
                 // 1) qué rutas son públicas
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/error", "/css/**", "/js/**", "/webjars/**")
+                        .requestMatchers("/login", "/error", "/registro", "/css/**", "/js/**", "/webjars/**")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/registro")
                         .permitAll()
                         // 2) a /etiquetas/** sólo ADMIN
                         .requestMatchers(HttpMethod.GET, "/etiquetas/**").hasRole("ADMIN")
@@ -53,7 +55,7 @@ public class SecurityConfig {
                         // el resto de URLs (p.ej. /suscripciones, /) autenticado (USER o ADMIN)
                         .anyRequest().authenticated())
                 // 3) login/logout
-                .formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/etiquetas", true)
+                .formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/convocatorias", true)
                         .permitAll())
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout"))
                 // 4) CSRF (por defecto ON); vamos a usar cookie repo para poder leerlo en JS/fetch

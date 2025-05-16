@@ -1,4 +1,4 @@
-package software.sebastian.oposiciones.controller;
+package software.sebastian.oposiciones.controller.admin;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,7 @@ import software.sebastian.oposiciones.service.EtiquetaService;
 import software.sebastian.oposiciones.service.EtiquetaService.TreeNode;
 
 @Controller
-@RequestMapping("/etiquetas")
+@RequestMapping("/admin/etiquetas")
 public class EtiquetaController {
 
     private final EtiquetaService svc;

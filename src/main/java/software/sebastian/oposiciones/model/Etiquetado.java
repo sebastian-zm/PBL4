@@ -10,6 +10,8 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "ETIQUETADO")
@@ -34,12 +36,13 @@ public class Etiquetado {
 
     private Integer status;
 
+
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
-
     public Etiquetado() {
     }
 

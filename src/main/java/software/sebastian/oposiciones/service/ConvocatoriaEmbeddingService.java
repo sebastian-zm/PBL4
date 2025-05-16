@@ -22,6 +22,7 @@ public class ConvocatoriaEmbeddingService extends ModeloEmbeddingService<Convoca
                                       ConvocatoriaRepository convocatoriaRepo) {
     super(openAIClient, modeloRepo, modeloEmbeddingRepo);
     this.convocatoriaRepo = convocatoriaRepo;
+    entityType = "CONVOCATORIA";
   }
 
   @Override
@@ -47,5 +48,4 @@ public class ConvocatoriaEmbeddingService extends ModeloEmbeddingService<Convoca
     return (titulo + "\n\n" + texto).trim();
   }
 
-  public String entityType = "CONVOCATORIA";
 }
