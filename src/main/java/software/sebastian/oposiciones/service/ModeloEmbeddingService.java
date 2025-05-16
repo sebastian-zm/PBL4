@@ -54,8 +54,6 @@ public abstract class ModeloEmbeddingService<E> {
       throw new IllegalStateException("Sin input para el embedding: " + entityType + id);
     }
 
-    System.out.println(input);
-
     // Obtener modeloId
     Integer modeloId = modeloRepo.findByNombre(EMBEDDING_MODEL)
         .orElseThrow(() -> new IllegalStateException("Modelo embedding no encontrado: " + EMBEDDING_MODEL))

@@ -18,11 +18,13 @@
       "settings": {
         "terminal.integrated.shell.linux": "/bin/bash",
         "maven.executable.path": "/workspace/mvnw",
+        // Path to the Python interpreter in the virtual environment.
         "python.defaultInterpreterPath": "${containerEnv:HOME}/.venv/bin/python"
       },
       "extensions": [
         "redhat.java",
         "vscjava.vscode-java-pack",
+        "vscjava.vscode-spring-boot",
         "vscjava.vscode-maven",
         "ms-python.python",
         "ms-toolsai.jupyter",
