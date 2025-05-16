@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title">Inicio</title>
+    <th:block layout:fragment="headExtras">
+        <!-- CSS adicional si es necesario -->
+    </th:block>
+</head>
+<body>
+<main layout:fragment="content" class="container my-4">
+    <div class="jumbotron">
+        <h1 class="display-4">Bienvenido a Oposiciones</h1>
+        <p class="lead">Gestiona convocatorias, etiquetas y suscripciones de manera sencilla.</p>
+        <hr class="my-4">
+        <p>Elige una sección para comenzar:</p>
+        <div class="list-group">
+            <a th:href="@{/convocatorias}" class="list-group-item list-group-item-action">
+                <i class="fas fa-bell me-2"></i>Convocatorias
+            </a>
+            <a th:href="@{/admin/etiquetas}" class="list-group-item list-group-item-action">
+                <i class="fas fa-tags me-2"></i>Etiquetas
+            </a>
+            <a th:href="@{/suscripciones}" class="list-group-item list-group-item-action">
+                <i class="fas fa-bell me-2"></i>Suscripciones
+            </a>
+        </div>
+    </div>
+</main>
+<th:block layout:fragment="scriptExtras">
+    <!-- Scripts adicionales -->
+</th:block>
+</body>
+</html>
