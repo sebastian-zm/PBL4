@@ -48,10 +48,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/registro")
                         .permitAll()
                         // 2) a /etiquetas/** sólo ADMIN
-                        .requestMatchers(HttpMethod.GET, "/etiquetas/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/etiquetas/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/etiquetas/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/etiquetas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/admin/etiquetas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/admin/etiquetas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/admin/etiquetas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/admin/etiquetas/**").hasRole("ADMIN")
                         // el resto de URLs (p.ej. /suscripciones, /) autenticado (USER o ADMIN)
                         .anyRequest().authenticated())
                 // 3) login/logout

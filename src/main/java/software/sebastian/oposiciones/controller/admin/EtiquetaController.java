@@ -29,7 +29,7 @@ public class EtiquetaController {
                          @RequestParam(required=false) String formato,
                          @RequestParam(required=false) Integer parentId) {
         svc.createWithParent(nombre, formato, parentId);
-        return "redirect:/etiquetas";
+        return "redirect:/admin/etiquetas";
     }
 
     @PostMapping("/{id}/edit")
@@ -37,7 +37,7 @@ public class EtiquetaController {
                        @RequestParam String nombre,
                        @RequestParam(required=false) String formato) {
         svc.update(id, nombre, formato);
-        return "redirect:/etiquetas";
+        return "redirect:/admin/etiquetas";
     }
 
     @PostMapping("/{id}/move")
@@ -51,6 +51,6 @@ public class EtiquetaController {
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Integer id) {
         svc.delete(id);
-        return "redirect:/etiquetas";
+        return "redirect:/admin/etiquetas";
     }
 }
