@@ -38,7 +38,7 @@
 
       <!-- form añadir hijo -->
       <form class="d-none form-add-child mt-1"
-            th:action="@{/etiquetas}" method="post">
+            th:action="@{/admin/etiquetas}" method="post">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" name="parentId" th:value="${node.etiqueta.etiquetaId}"/>
         <div class="input-group input-group-sm">

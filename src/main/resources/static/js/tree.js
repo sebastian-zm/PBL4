@@ -24,7 +24,7 @@ function drop(e) {
     e.stopPropagation();
   }
   if (draggedId && draggedId !== targetId) {
-    fetch(`/etiquetas/${draggedId}/move?parentId=${targetId}`, {
+    fetch(`/admin/etiquetas/${draggedId}/move?parentId=${targetId}`, {
       method: 'POST',
       headers: { 
         [csrfHeader]: csrfToken 
@@ -47,7 +47,7 @@ function showAddChildForm(btn) {
 function deleteNode(btn) {
   let id = btn.closest('li').dataset.id;
   if (confirm('¿Borrar etiqueta ' + id + ' y reparentar?')) {
-    fetch(`/etiquetas/${id}/delete`, {
+    fetch(`/admin/etiquetas/${id}/delete`, {
       method:'POST', 
       headers: { 
         [csrfHeader]: csrfToken 
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!name) return alert('Nombre vacío');
       let form = document.createElement('form');
       form.method = 'post';
-      form.action = '/etiquetas';
+      form.action = '/admin/etiquetas';
       form.innerHTML = `
         <input type="hidden" name="${csrfParam}" value="${csrfToken}"/>
         <input name="nombre" value="${name}"/>
