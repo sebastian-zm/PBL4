@@ -5,13 +5,7 @@
   "workspaceFolder": "/workspace",
   "shutdownAction": "stopCompose",
 
-  "initializeCommand": {
-    "sh": [
-      "sh",
-      "-c",
-      "mkdir -p .devcontainer/workspace_tmp/src/main .devcontainer/workspace_tmp/src/test && cp -r src/main/java .devcontainer/workspace_tmp/src/main/ 2>/dev/null || true && cp -r src/test/java .devcontainer/workspace_tmp/src/test/ 2>/dev/null || true"
-    ]
-  },
+  "initializeCommand": "node .devcontainer/scripts/prepare-workspace.js",
 
   "onCreateCommand": [
     "bash",
