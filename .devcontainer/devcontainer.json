@@ -4,18 +4,31 @@
   "service": "app",
   "workspaceFolder": "/workspace",
   "shutdownAction": "stopCompose",
+
+  "initializeCommand": {
+    "sh": [
+      "sh",
+      "-c",
+      "mkdir -p .devcontainer/workspace_tmp/src/main .devcontainer/workspace_tmp/src/test && cp -r src/main/java .devcontainer/workspace_tmp/src/main/ 2>/dev/null || true && cp -r src/test/java .devcontainer/workspace_tmp/src/test/ 2>/dev/null || true"
+    ]
+  },
+
+  "onCreateCommand": [
+    "bash",
+    "-c",
+    "mkdir -p /workspace/src/main/java /workspace/src/test/java"
+  ],
+
   "customizations": {
     "vscode": {
       "settings": {
         "terminal.integrated.shell.linux": "/bin/bash",
         "maven.executable.path": "/workspace/mvnw",
-        // Path to the Python interpreter in the virtual environment.
         "python.defaultInterpreterPath": "${containerEnv:HOME}/.venv/bin/python"
       },
       "extensions": [
         "redhat.java",
         "vscjava.vscode-java-pack",
-        "vscjava.vscode-spring-boot",
         "vscjava.vscode-maven",
         "ms-python.python",
         "ms-toolsai.jupyter",
@@ -29,12 +42,19 @@
       ]
     }
   },
+
   "forwardPorts": [3306, 8080, 3000, 8888],
-  "postCreateCommand": "sudo chown -R ubuntu:ubuntu . ~/.m2 ~/.npm ~/.venv && .devcontainer/scripts/init-python-env.sh && .devcontainer/scripts/init-db.sh && echo \"✔ Entorno inicializado\"",
+
+  "postCreateCommand": [
+    "bash",
+    "-c",
+    "sudo chown -R ubuntu:ubuntu . ~/.{m2,npm,venv} && /scripts/init-python-env.sh && /scripts/init-db.sh && /scripts/sync-java-files.sh && echo \"✔ Entorno inicializado\""
+  ],
+
   "mounts": [
-    "source=pbl4-m2-cache,target=/home/vscode/.m2,type=volume",
-    "source=pbl4-npm-cache,target=/home/vscode/.npm,type=volume",
-    "source=pbl4-venv-cache,target=/home/vscode/.venv,type=volume",
-    "source=pbl4-java-target,target=/workspace/target,type=volume"
+    "source=pbl4-m2-cache,target=/home/ubuntu/.m2,type=volume",
+    "source=pbl4-npm-cache,target=/home/ubuntu/.npm,type=volume",
+    "source=pbl4-venv-cache,target=/home/ubuntu/.venv,type=volume",
+    "source=${localWorkspaceFolder}/.devcontainer/workspace_tmp,target=/workspace_host,type=bind"
   ]
 }

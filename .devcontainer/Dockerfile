@@ -6,7 +6,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       curl git unzip nodejs npm \
       python3 python3-venv python3-pip \
-      default-mysql-client && \
+      default-mysql-client rsync && \
     rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_HOME=/usr/local/openjdk-17
@@ -21,4 +21,3 @@ USER ubuntu
 WORKDIR /workspace
 
 CMD ["sleep", "infinity"]
-

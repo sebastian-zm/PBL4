@@ -13,17 +13,32 @@ services:
       MYSQL_PASSWORD: dev
       MYSQL_HOST: db
     volumes:
-      - ..:/workspace:cached,Z
+      # Mount only non-Java files from host
+      - ../bin:/workspace/bin:cached,Z
+      - ../src/main/resources:/workspace/src/main/resources:cached,Z
+      - ../src/test/resources:/workspace/src/test/resources:cached,Z
+      - ../.mvn:/workspace/.mvn:cached,Z
+      - ../pom.xml:/workspace/pom.xml:cached,Z
+      - ../mvnw:/workspace/mvnw:cached,Z
+      - ../mvnw.cmd:/workspace/mvnw.cmd:cached,Z
+      - ../.gitignore:/workspace/.gitignore:cached,Z
+      - ../.gitattributes:/workspace/.gitattributes:cached,Z
+      - ../requirements.txt:/workspace/requirements.txt:cached,Z
+      # Use volumes for Java code and build artifacts
+      - pbl4-java-src-main:/workspace/src/main/java:Z
+      - pbl4-java-src-test:/workspace/src/test/java:Z
+      - pbl4-java-target:/workspace/target:Z
+      # Other volumes
       - pbl4-venv-cache:/home/ubuntu/.venv:Z
       - pbl4-m2-cache:/home/ubuntu/.m2:Z
       - pbl4-npm-cache:/home/ubuntu/.npm:Z
-      - pbl4-java-target:/workspace/target:Z
     ports:
       - "8080:8080"
       - "3000:3000"
       - "8888:8888"
     depends_on:
       - db
+    user: ubuntu
 
   db:
     image: docker.io/mysql:8.0
@@ -36,12 +51,14 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - db-data:/var/lib/mysql:Z
+      - pbl4-db-data:/var/lib/mysql:Z
 
 volumes:
-  db-data:
+  pbl4-db-data:
   pbl4-m2-cache:
   pbl4-npm-cache:
   pbl4-venv-cache:
-  pbl4-java-target:
+  pbl4-java-src-main:  # Volume for main Java source files
+  pbl4-java-src-test:  # Volume for test Java source files
+  pbl4-java-target:    # Volume for compiled classes
 
