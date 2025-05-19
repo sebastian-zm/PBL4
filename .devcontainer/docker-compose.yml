@@ -14,9 +14,10 @@ services:
       MYSQL_HOST: db
     volumes:
       - ..:/workspace:cached,Z
-      - venv-cache:/home/ubuntu/.venv:Z
-      - m2-cache:/home/ubuntu/.m2:Z
-      - npm-cache:/home/ubuntu/.npm:Z
+      - pbl4-venv-cache:/home/ubuntu/.venv:Z
+      - pbl4-m2-cache:/home/ubuntu/.m2:Z
+      - pbl4-npm-cache:/home/ubuntu/.npm:Z
+      - pbl4-java-target:/workspace/target:Z
     ports:
       - "8080:8080"
       - "3000:3000"
@@ -39,7 +40,8 @@ services:
 
 volumes:
   db-data:
-  m2-cache:
-  npm-cache:
-  venv-cache:
+  pbl4-m2-cache:
+  pbl4-npm-cache:
+  pbl4-venv-cache:
+  pbl4-java-target:
 

@@ -30,10 +30,11 @@
     }
   },
   "forwardPorts": [3306, 8080, 3000, 8888],
-  "postCreateCommand": ".devcontainer/scripts/init-python-env.sh && .devcontainer/scripts/init-db.sh && echo \"✔ Entorno inicializado\"",
+  "postCreateCommand": "sudo chown -R ubuntu:ubuntu . ~/.m2 ~/.npm ~/.venv && .devcontainer/scripts/init-python-env.sh && .devcontainer/scripts/init-db.sh && echo \"✔ Entorno inicializado\"",
   "mounts": [
-    "source=m2-cache,target=/home/vscode/.m2,type=volume",
-    "source=npm-cache,target=/home/vscode/.npm,type=volume",
-    "source=venv-cache,target=/home/vscode/.venv,type=volume"
+    "source=pbl4-m2-cache,target=/home/vscode/.m2,type=volume",
+    "source=pbl4-npm-cache,target=/home/vscode/.npm,type=volume",
+    "source=pbl4-venv-cache,target=/home/vscode/.venv,type=volume",
+    "source=pbl4-java-target,target=/workspace/target,type=volume"
   ]
 }
