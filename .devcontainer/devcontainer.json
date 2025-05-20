@@ -5,7 +5,7 @@
   "workspaceFolder": "/workspace",
   "shutdownAction": "stopCompose",
 
-  "initializeCommand": "node .devcontainer/scripts/prepare-workspace.js",
+  "initializeCommand": "python .devcontainer/scripts/prepare-workspace.py",
 
   "onCreateCommand": [
     "bash",
