@@ -22,6 +22,7 @@ services:
       - ../.gitignore:/workspace/.gitignore:cached,Z
       - ../.gitattributes:/workspace/.gitattributes:cached,Z
       - ../requirements.txt:/workspace/requirements.txt:cached,Z
+      - ../.env:/workspace/.env:cached,Z
       # Use volumes for Java code and build artifacts
       - pbl4-java-src-main:/workspace/src/main/java:Z
       - pbl4-java-src-test:/workspace/src/test/java:Z
