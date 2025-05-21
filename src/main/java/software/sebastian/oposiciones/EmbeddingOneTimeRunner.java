@@ -6,6 +6,11 @@ import software.sebastian.oposiciones.service.EtiquetaEmbeddingBatchService;
 
 public class EmbeddingOneTimeRunner {
 
+    /* Para ejecutarlo una sola vez
+     ./mvnw spring-boot:run \
+    -Dspring-boot.run.main-class=software.sebastian.oposiciones.EmbeddingOneTimeRunner
+*/
+
     public static void main(String[] args) {
         // 1) Arranca el contexto de Spring Boot
         ConfigurableApplicationContext ctx =

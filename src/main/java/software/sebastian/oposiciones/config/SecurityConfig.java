@@ -43,21 +43,31 @@ public class SecurityConfig {
         http
                 // 1) qué rutas son públicas
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/error", "/registro", "/css/**", "/js/**", "/webjars/**")
+                        .requestMatchers("/login", "/error", "/", "/convocatorias", "/etiquetas" ,"/registro", "/css/**", "/js/**", "/webjars/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/registro")
                         .permitAll()
                         // 2) a /etiquetas/** sólo ADMIN
-                        .requestMatchers(HttpMethod.GET, "/admin/etiquetas/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/admin/etiquetas/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/admin/etiquetas/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/admin/etiquetas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/etiquetas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/etiquetas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/etiquetas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/etiquetas/**").hasRole("ADMIN")
                         // el resto de URLs (p.ej. /suscripciones, /) autenticado (USER o ADMIN)
                         .anyRequest().authenticated())
                 // 3) login/logout
-                .formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/convocatorias", true)
+                .formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/", true)
                         .permitAll())
-                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout"))
+                .logout(logout -> logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/")        // al cerrar sesión, redirige a la página de inicio
+                    .invalidateHttpSession(true)  // invalida la sesión HTTP
+                    .clearAuthentication(true)    // limpia el objeto de autenticación
+                    .deleteCookies("JSESSIONID")  // borra la cookie de sesión
+                    )
                 // 4) CSRF (por defecto ON); vamos a usar cookie repo para poder leerlo en JS/fetch
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));

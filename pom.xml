@@ -23,7 +23,6 @@
   </properties>
 
   <dependencies>
-
     <!-- dotenv para cargar variables de entorno -->
     <dependency>
       <groupId>me.paulschwarz</groupId>
