@@ -24,6 +24,9 @@ services:
       - ../.gitattributes:/workspace/.gitattributes:cached,Z
       - ../requirements.txt:/workspace/requirements.txt:cached,Z
       - ../.env:/workspace/.env:cached,Z
+      - ./scripts:/scripts:cached,Z
+      - ../src/main/java:/workspace_host/src/main/java:cached,Z
+      - ../src/test/java:/workspace_host/src/test/java:cached,Z
       # Use volumes for Java code and build artifacts
       - pbl4-java-src-main:/workspace/src/main/java:Z
       - pbl4-java-src-test:/workspace/src/test/java:Z
