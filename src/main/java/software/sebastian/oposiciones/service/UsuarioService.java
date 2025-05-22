@@ -3,7 +3,7 @@ package software.sebastian.oposiciones.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.security.Principal;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import software.sebastian.oposiciones.repository.UsuarioRepository;
@@ -20,6 +20,13 @@ public class UsuarioService {
 
     public List<Usuario> findAll() {
         return userRepo.findAll();
+    }
+
+
+    public Usuario getCurrentUser(Principal principal) {
+        String username = principal.getName();
+        Usuario usuario = userRepo.findByEmail(username).orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+        return usuario;
     }
 
     @Transactional

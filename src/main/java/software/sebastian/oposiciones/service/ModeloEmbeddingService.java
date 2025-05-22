@@ -53,7 +53,6 @@ public abstract class ModeloEmbeddingService<E> {
     if (input == null || input.trim().isEmpty()) {
       throw new IllegalStateException("Sin input para el embedding: " + entityType + id);
     }
-
     // Obtener modeloId
     Integer modeloId = modeloRepo.findByNombre(EMBEDDING_MODEL)
         .orElseThrow(() -> new IllegalStateException("Modelo embedding no encontrado: " + EMBEDDING_MODEL))
