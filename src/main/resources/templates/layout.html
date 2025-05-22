@@ -2,7 +2,7 @@
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:fragment="layout">
+      layout:fragment="layout"> 
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -44,14 +44,15 @@
                   <a class="nav-link" th:href="@{/}"><i class="fas fa-home me-1"></i> Inicio</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" th:href="@{/admin/etiquetas}"><i class="fas fa-tags me-1"></i> Etiquetas</a>
+                  <a class="nav-link" th:href="@{/etiquetas}"><i class="fas fa-tags me-1"></i> Etiquetas</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" th:href="@{/suscripciones}"><i class="fas fa-bell me-1"></i> Suscripciones</a>
+                  <a class="nav-link" th:href="@{/suscripciones}"><i class="fas fa-star me-1"></i> Suscripciones</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" th:href="@{/convocatorias}"><i class="fas fa-bell me-1"></i> Convocatorias</a>
+                <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/registro}"><i class="fas fa-user-plus me-1"></i> Registrarse</a>
                 </li>
+                 <li><a class="nav-link" th:href="@{/convocatorias}"> <i class="fas fa-bell me-1"></i> BOE</a></li>
                 <!-- Añade más enlaces según tus rutas -->
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
