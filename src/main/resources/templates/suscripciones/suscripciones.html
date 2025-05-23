@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title layout:fragment="title">Suscripciones</title>
+    <th:block layout:fragment="headExtras">
+     
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    </th:block>
+</head>
+<body>
+<main class="container my-4" role="main" layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1><i class="bi bi-star me-2"></i>Suscripciones</h1>
+        <a class="btn btn-primary" th:href="@{/suscripciones/nueva_sus}">
+            <i class="bi bi-plus me-1"></i>Agregar
+        </a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Fecha de creación</th>
+                    <th scope="col">Fecha de edición</th>
+                    <th scope="col">Etiquetas</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="j : ${suscripciones_usuario}">
+                    <td th:text="${j.createdAt.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy'))}"></td>
+                    <td th:text="${j.updatedAt.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy'))}"></td>
+                    <td>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span th:each="etiqueta : ${etiquetasPorSuscripcion[j.suscripcionId]}" 
+                                  class="badge bg-secondary text-white p-2">
+                                <i class="bi bi-tag-fill me-1"></i>
+                                <span th:text="${etiqueta.nombre}"></span>
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form th:action="@{/suscripciones/editar/{id}(id=${j.suscripcionId})}" 
+                                  method="get"
+                                  style="display: inline;">
+                                <button type="submit" class="btn btn-outline-primary btn-sm" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/suscripciones/eliminar/{id}(id=${j.suscripcionId})}" 
+                                  method="post"
+                                  style="display: inline;"
+                                  onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta suscripción?');">
+                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<th:block layout:fragment="scriptExtras">
+    <!-- Scripts adicionales si son necesarios -->
+</th:block>
+</body>
+</html>
