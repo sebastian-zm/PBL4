@@ -14,19 +14,19 @@ import software.sebastian.oposiciones.model.Suscripcion;
 import software.sebastian.oposiciones.model.Usuario;
 import software.sebastian.oposiciones.service.EtiquetaService;
 import software.sebastian.oposiciones.service.SuscripcionService;
-import software.sebastian.oposiciones.service.Suscripcion_EtiquetaService;
+import software.sebastian.oposiciones.service.SuscripcionEtiquetaService;
 import software.sebastian.oposiciones.service.UsuarioService;
 
 @Controller
 public class SuscripcionController {
 
     private final SuscripcionService service;
-    private final Suscripcion_EtiquetaService serviceSE;
+    private final SuscripcionEtiquetaService serviceSE;
 
     private final UsuarioService usService;
     private final EtiquetaService etiquetaService;
 
-    public SuscripcionController(SuscripcionService service, Suscripcion_EtiquetaService serviceSE,
+    public SuscripcionController(SuscripcionService service, SuscripcionEtiquetaService serviceSE,
             UsuarioService usService, EtiquetaService etiquetaService) {
         this.service = service;
         this.serviceSE = serviceSE;
@@ -48,14 +48,13 @@ public class SuscripcionController {
         List<Etiqueta> etiquetas = etiquetaService.findAll();
         model.addAttribute("etiquetas", etiquetas);
         model.addAttribute("suscripcionForm", new SuscripcionForm());
-          model.addAttribute("actionUrl", "/suscripciones/guardar");
-     
+        model.addAttribute("actionUrl", "/suscripciones/guardar");  
         return "suscripciones/nueva_sus";
     }
 
     @PostMapping("/suscripciones/guardar")
     public String guardarSuscripcion(@ModelAttribute SuscripcionForm form, Principal principal) {
-         Usuario usuario = usService.getCurrentUser(principal); 
+        Usuario usuario = usService.getCurrentUser(principal); 
         service.create(form.getEtiquetasSeleccionadas(), usuario.getUsuarioId());
         return "redirect:/suscripciones";
     }
@@ -78,7 +77,7 @@ public class SuscripcionController {
         SuscripcionForm nuestralista = new SuscripcionForm();
         nuestralista.setEtiquetasSeleccionadas(serviceSE.getEtiquetaIdsPorSuscripcion(suscripcion.getSuscripcionId()));
         model.addAttribute("suscripcionForm", nuestralista);
-           model.addAttribute("actionUrl", "/suscripciones/editar/" + id + "/guardar");
+        model.addAttribute("actionUrl", "/suscripciones/editar/" + id + "/guardar");
         return "suscripciones/nueva_sus";
     }
 
@@ -88,5 +87,4 @@ public class SuscripcionController {
         return "redirect:/suscripciones";
     }
 
- 
 }

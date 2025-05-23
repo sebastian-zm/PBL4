@@ -1,2 +1,4 @@
 /mvnw text eol=lf
+/.devcontainer/scripts/* text eol=lf
+/bin/* eol=lf
 *.cmd text eol=crlf

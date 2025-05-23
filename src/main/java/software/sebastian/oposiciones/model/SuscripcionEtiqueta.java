@@ -15,8 +15,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "SUSCRIPCION_ETIQUETA")
-@IdClass(Suscripcion_Etiqueta.PrimaryKey.class)
-public class Suscripcion_Etiqueta {
+@IdClass(SuscripcionEtiqueta.PrimaryKey.class)
+public class SuscripcionEtiqueta {
 
     @Id
     @Column(nullable = false)
@@ -34,10 +34,10 @@ public class Suscripcion_Etiqueta {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-    public Suscripcion_Etiqueta() {
+    public SuscripcionEtiqueta() {
     }
 
-    public Suscripcion_Etiqueta(Integer suscripcionId, Integer etiquetaId ) {
+    public SuscripcionEtiqueta(Integer suscripcionId, Integer etiquetaId ) {
         this.suscripcionId = suscripcionId;
         this.etiquetaId = etiquetaId;
     }
@@ -82,8 +82,8 @@ public class Suscripcion_Etiqueta {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Suscripcion_Etiqueta)) return false;
-        Suscripcion_Etiqueta that = (Suscripcion_Etiqueta) o;
+        if (!(o instanceof SuscripcionEtiqueta)) return false;
+        SuscripcionEtiqueta that = (SuscripcionEtiqueta) o;
         return Objects.equals(suscripcionId, that.suscripcionId) &&
                Objects.equals(etiquetaId, that.etiquetaId);
     }

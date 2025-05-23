@@ -8,20 +8,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import software.sebastian.oposiciones.model.Suscripcion_Etiqueta;
+import software.sebastian.oposiciones.model.SuscripcionEtiqueta;
 
 @Repository
-public interface Suscripcion_EtiquetaRepository
-        extends JpaRepository<Suscripcion_Etiqueta, Suscripcion_Etiqueta.PrimaryKey> {
+public interface SuscripcionEtiquetaRepository
+        extends JpaRepository<SuscripcionEtiqueta, SuscripcionEtiqueta.PrimaryKey> {
 
     /**
      * @param suscripcionID
      * @return
      */
-    List<Suscripcion_Etiqueta> findBySuscripcionId(Integer suscripcionID);
+    List<SuscripcionEtiqueta> findBySuscripcionId(Integer suscripcionID);
 
     @Modifying
-    @Query("DELETE FROM Suscripcion_Etiqueta se WHERE se.suscripcionId = :id")
+    @Query("DELETE FROM SuscripcionEtiqueta se WHERE se.suscripcionId = :id")
     void deleteBySuscripcionId(@Param("id") Integer id);
 
 }
