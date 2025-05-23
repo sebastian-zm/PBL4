@@ -48,7 +48,7 @@ public class SuscripcionController {
         List<Etiqueta> etiquetas = etiquetaService.findAll();
         model.addAttribute("etiquetas", etiquetas);
         model.addAttribute("suscripcionForm", new SuscripcionForm());
-        model.addAttribute("actionUrl", "/suscripciones/guardar");
+        model.addAttribute("actionUrl", "/suscripciones/guardar");  
         return "suscripciones/nueva_sus";
     }
 
