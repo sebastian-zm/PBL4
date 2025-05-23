@@ -27,6 +27,9 @@ public class SuscripcionController {
     private final EtiquetaService etiquetaService;
 
     public SuscripcionController(SuscripcionService service, SuscripcionEtiquetaService serviceSE,
+
+
+
             UsuarioService usService, EtiquetaService etiquetaService) {
         this.service = service;
         this.serviceSE = serviceSE;

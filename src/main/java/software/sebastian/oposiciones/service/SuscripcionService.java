@@ -8,6 +8,7 @@ import software.sebastian.oposiciones.model.SuscripcionEtiqueta;
 import software.sebastian.oposiciones.repository.SuscripcionRepository;
 import software.sebastian.oposiciones.repository.SuscripcionEtiquetaRepository;
 
+
 @Service
 public class SuscripcionService {
 
@@ -17,6 +18,7 @@ public class SuscripcionService {
 
     public SuscripcionService(SuscripcionRepository suscripcionRepo,
             SuscripcionEtiquetaRepository susetiRepo) {
+
         this.suscripcionRepo = suscripcionRepo;
         this.susetiRepo = susetiRepo;
     }
@@ -56,6 +58,7 @@ public class SuscripcionService {
         for (Integer etiquetaId : lista) {
             SuscripcionEtiqueta se =
                     new SuscripcionEtiqueta(sSaved.getSuscripcionId(), etiquetaId);
+
             susetiRepo.save(se);
         }
         return sSaved;
