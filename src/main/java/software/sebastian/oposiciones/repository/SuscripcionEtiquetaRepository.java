@@ -21,7 +21,7 @@ public interface SuscripcionEtiquetaRepository
     List<SuscripcionEtiqueta> findBySuscripcionId(Integer suscripcionID);
 
     @Modifying
-    @Query("DELETE FROM Suscripcion_Etiqueta se WHERE se.suscripcionId = :id")
+    @Query("DELETE FROM SuscripcionEtiqueta se WHERE se.suscripcionId = :id")
     void deleteBySuscripcionId(@Param("id") Integer id);
 
 }
