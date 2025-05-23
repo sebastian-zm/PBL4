@@ -44,7 +44,7 @@
   "postCreateCommand": [
     "bash",
     "-c",
-    "sudo chown -R ubuntu:ubuntu . ~/.{m2,npm,venv} && /scripts/init-python-env.sh && /scripts/init-db.sh && /scripts/sync-java-files.sh && echo \"✔ Entorno inicializado\""
+    "sudo chown -R ubuntu:ubuntu . ~/.{m2,npm,venv} /scripts /workspace_host && /scripts/init-python-env.sh && /scripts/init-db.sh && /scripts/sync-java-files.sh && echo \"✔ Entorno inicializado\""
   ],
 
   "mounts": [
