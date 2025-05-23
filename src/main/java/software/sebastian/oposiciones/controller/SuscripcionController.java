@@ -51,14 +51,13 @@ public class SuscripcionController {
         List<Etiqueta> etiquetas = etiquetaService.findAll();
         model.addAttribute("etiquetas", etiquetas);
         model.addAttribute("suscripcionForm", new SuscripcionForm());
-          model.addAttribute("actionUrl", "/suscripciones/guardar");
-     
+        model.addAttribute("actionUrl", "/suscripciones/guardar");  
         return "suscripciones/nueva_sus";
     }
 
     @PostMapping("/suscripciones/guardar")
     public String guardarSuscripcion(@ModelAttribute SuscripcionForm form, Principal principal) {
-         Usuario usuario = usService.getCurrentUser(principal); 
+        Usuario usuario = usService.getCurrentUser(principal); 
         service.create(form.getEtiquetasSeleccionadas(), usuario.getUsuarioId());
         return "redirect:/suscripciones";
     }
@@ -81,7 +80,7 @@ public class SuscripcionController {
         SuscripcionForm nuestralista = new SuscripcionForm();
         nuestralista.setEtiquetasSeleccionadas(serviceSE.getEtiquetaIdsPorSuscripcion(suscripcion.getSuscripcionId()));
         model.addAttribute("suscripcionForm", nuestralista);
-           model.addAttribute("actionUrl", "/suscripciones/editar/" + id + "/guardar");
+        model.addAttribute("actionUrl", "/suscripciones/editar/" + id + "/guardar");
         return "suscripciones/nueva_sus";
     }
 
@@ -91,5 +90,4 @@ public class SuscripcionController {
         return "redirect:/suscripciones";
     }
 
- 
 }
