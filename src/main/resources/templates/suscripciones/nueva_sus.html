@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Crear/Editar Suscripción</title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+</head>
+<body>
+<main class="container my-5" role="main" layout:fragment="content">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-star-fill me-2"></i>
+                        Crear/Editar Suscripción
+                    </h2>
+                </div>
+                
+                <div class="card-body">
+                    <form th:action="${actionUrl}" th:object="${suscripcionForm}" method="post">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold mb-3">
+                                <i class="bi bi-tags me-2"></i>
+                                Elige tus etiquetas favoritas:
+                            </label>
+                            
+                            <div class="row g-2">
+                                <div th:each="etiqueta : ${etiquetas}" class="col-6 col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" 
+                                               th:field="*{etiquetasSeleccionadas}" 
+                                               th:value="${etiqueta.etiquetaId}" 
+                                               th:id="'etiqueta_' + ${etiqueta.etiquetaId}">
+                                        <label class="form-check-label" 
+                                               th:for="'etiqueta_' + ${etiqueta.etiquetaId}"
+                                               th:text="${etiqueta.nombre}">
+                                               Etiqueta
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a th:href="@{/suscripciones}" class="btn btn-outline-secondary me-md-2">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Guardar Suscripción
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
