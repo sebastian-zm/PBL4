@@ -2,6 +2,7 @@ package software.sebastian.oposiciones.service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,40 @@ public class EtiquetaService {
         this.arbolRepo = ar;
         this.etiquetaEmbeddingService = etiquetaEmbeddingService;
     }
+
+public List<Etiqueta> getEtiquetasEnOrdenArbol() {
+    List<TreeNode> forest = getTree();
+    List<Etiqueta> ordered = new ArrayList<>();
+    for (TreeNode node : forest) {
+        preOrder(node, ordered);
+    }
+    return ordered;
+}
+
+
+public Map<Integer, List<Integer>> obtenerRelacionesPadreHijo() {
+    List<ArbolEtiqueta> relaciones = arbolRepo.findAll();
+    Map<Integer, List<Integer>> mapa = new HashMap<>();
+
+    for (ArbolEtiqueta ae : relaciones) {
+        Integer padre = ae.getAncestro().getEtiquetaId();
+        Integer hijo = ae.getDescendiente().getEtiquetaId();
+
+        if (!padre.equals(hijo)) {
+            mapa.computeIfAbsent(padre, k -> new ArrayList<>()).add(hijo);
+        }
+    }
+
+    return mapa;
+}
+
+
+private void preOrder(TreeNode node, List<Etiqueta> result) {
+    result.add(node.getEtiqueta()); // Suponiendo que TreeNode tiene getEtiqueta()
+    for (TreeNode child : node.getChildren()) {
+        preOrder(child, result);
+    }
+}
 
     public List<Etiqueta> findAll() {
         return etiquetaRepo.findAll();
@@ -113,7 +148,23 @@ public class EtiquetaService {
 
     public static class TreeNode {
         public Etiqueta etiqueta;
+        public Etiqueta getEtiqueta() {
+            return etiqueta;
+        }
+
+        public void setEtiqueta(Etiqueta etiqueta) {
+            this.etiqueta = etiqueta;
+        }
+
         public List<TreeNode> children = new ArrayList<>();
+
+        public List<TreeNode> getChildren() {
+            return children;
+        }
+
+        public void setChildren(List<TreeNode> children) {
+            this.children = children;
+        }
 
         public TreeNode(Etiqueta e) {
             this.etiqueta = e;

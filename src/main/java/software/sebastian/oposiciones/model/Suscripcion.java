@@ -17,7 +17,17 @@ public class Suscripcion {
     @Column(nullable = false, unique = true)
     private Integer usuarioId;
 
-    
+
+        @Column(nullable = false, unique = true)
+    private String nombre;
+
+    public String getNombre() {
+            return nombre;
+        }
+
+        public void setNombre(String nombre) {
+            this.nombre = nombre;
+        }
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
