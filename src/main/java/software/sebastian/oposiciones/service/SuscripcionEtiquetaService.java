@@ -4,6 +4,7 @@ package software.sebastian.oposiciones.service;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.sebastian.oposiciones.model.ArbolEtiqueta;
 import software.sebastian.oposiciones.model.Etiqueta;
 import software.sebastian.oposiciones.model.SuscripcionEtiqueta;
 import software.sebastian.oposiciones.repository.EtiquetaRepository;
@@ -12,7 +13,9 @@ import software.sebastian.oposiciones.repository.SuscripcionEtiquetaRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 @Service
@@ -28,7 +31,6 @@ public class SuscripcionEtiquetaService {
         this.suscripcion_etiquetaRepo = suscripcion_etiquetaRepo;
         this.etiquetaRepo = etiquetaRepo;
         this.susRepo = susRepo;
-
     }
 
     public Map<Integer, List<Etiqueta>> getEtiquetasPorSuscripcion() {
@@ -53,22 +55,30 @@ public class SuscripcionEtiquetaService {
         return resultado;
     }
 
-
-    // public List<Etiqueta> getEtiquetasDeSuscripcion(Integer suscripcionId) {
-    // List<Suscripcion_Etiqueta> relaciones =
-    // suscripcion_etiquetaRepo.findBySuscripcionId(suscripcionId);
-    // List<Etiqueta> etiquetas = new ArrayList<>();
-    // for (Suscripcion_Etiqueta relacion : relaciones) {
-    // etiquetaRepo.findById(relacion.getEtiquetaId()).ifPresent(etiquetas::add);
-    // }
-    // return etiquetas;
-    // }
-
     public List<Integer> getEtiquetaIdsPorSuscripcion(Integer suscripcionId) {
         return suscripcion_etiquetaRepo.findBySuscripcionId(suscripcionId).stream()
                 .map(SuscripcionEtiqueta::getEtiquetaId).collect(Collectors.toList());
     }
 
+    public Map<Integer, Set<Integer>> mapaDescendientesPorEtiqueta(List<ArbolEtiqueta> relaciones) {
+        Map<Integer, Set<Integer>> descendientes = new HashMap<>();
+
+        for (ArbolEtiqueta relacion : relaciones) {
+            int ancestro = relacion.getAncestro().getEtiquetaId();
+            int descendiente = relacion.getDescendiente().getEtiquetaId();
+            descendientes.computeIfAbsent(ancestro, k -> new HashSet<>()).add(descendiente);
+        }
+        Set<Integer> todosLosIds = new HashSet<>();
+        for (ArbolEtiqueta rel : relaciones) {
+            todosLosIds.add(rel.getAncestro().getEtiquetaId());
+            todosLosIds.add(rel.getDescendiente().getEtiquetaId());
+        }
+        for (Integer id : todosLosIds) {
+            descendientes.computeIfAbsent(id, k -> new HashSet<>()).add(id);
+        }
+
+        return descendientes;
+    }
 
     @Transactional
     public void deleteEtiquetasPorSuscripcion(Integer id) {
@@ -76,9 +86,11 @@ public class SuscripcionEtiquetaService {
     }
 
     @Transactional
-    public void update(List<Integer> lista, Integer id) {
+
+    public void update(List<Integer> lista, Integer id, String nombre) {
         susRepo.findById(id).ifPresent(suscripcion -> {
             suscripcion.setUpdatedAt(LocalDateTime.now());
+            suscripcion.setNombre(nombre);
             susRepo.save(suscripcion);
         });
         suscripcion_etiquetaRepo.deleteBySuscripcionId(id);
@@ -86,8 +98,5 @@ public class SuscripcionEtiquetaService {
             SuscripcionEtiqueta se = new SuscripcionEtiqueta(id, etiquetaId);
             suscripcion_etiquetaRepo.save(se);
         }
-
     }
-
-
 }

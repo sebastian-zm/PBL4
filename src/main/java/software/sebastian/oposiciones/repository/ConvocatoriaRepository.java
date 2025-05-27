@@ -5,4 +5,5 @@ import software.sebastian.oposiciones.model.Convocatoria;
 
 public interface ConvocatoriaRepository extends JpaRepository<Convocatoria, Integer> {
     // podrías añadir métodos como findByBoeId(...) si los necesitas
+
 }

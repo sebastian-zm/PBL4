@@ -4,10 +4,6 @@
       layout:decorate="~{layout}">
 <head>
     <title layout:fragment="title">Suscripciones</title>
-    <th:block layout:fragment="headExtras">
-     
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-    </th:block>
 </head>
 <body>
 <main class="container my-4" role="main" layout:fragment="content">
@@ -20,7 +16,7 @@
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead class="table-light">
-                <tr>
+                <tr> <th scope="col">Nombre</th>
                     <th scope="col">Fecha de creación</th>
                     <th scope="col">Fecha de edición</th>
                     <th scope="col">Etiquetas</th>
@@ -29,6 +25,8 @@
             </thead>
             <tbody>
                 <tr th:each="j : ${suscripciones_usuario}">
+
+                    <td th:text="${j.nombre}"></td>
                     <td th:text="${j.createdAt.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy'))}"></td>
                     <td th:text="${j.updatedAt.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy'))}"></td>
                     <td>

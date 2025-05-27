@@ -50,9 +50,11 @@ public class SuscripcionService {
     }
 
     @Transactional
-    public Suscripcion create(List<Integer> lista, Integer id) {
+
+    public Suscripcion create(List<Integer> lista, Integer id,String nombre) {
         Suscripcion s = new Suscripcion();
         s.setUsuarioId(id);
+        s.setNombre(nombre);
         Suscripcion sSaved = suscripcionRepo.save(s);
 
         for (Integer etiquetaId : lista) {

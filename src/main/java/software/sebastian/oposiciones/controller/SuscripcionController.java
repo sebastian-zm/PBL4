@@ -1,5 +1,6 @@
 package software.sebastian.oposiciones.controller;
 
+import java.util.Map;
 import java.util.List;
 import java.security.Principal;
 import org.springframework.stereotype.Controller;
@@ -37,7 +38,7 @@ public class SuscripcionController {
     @GetMapping("/suscripciones")
     public String verSuscripciones(Model model, Principal principal) {
 
-        Usuario usuario = usService.getCurrentUser(principal); 
+        Usuario usuario = usService.getCurrentUser(principal);
         model.addAttribute("suscripciones_usuario", service.findSusByUser(usuario.getUsuarioId()));
         model.addAttribute("etiquetasPorSuscripcion", serviceSE.getEtiquetasPorSuscripcion());
         return "suscripciones/suscripciones";
@@ -45,17 +46,24 @@ public class SuscripcionController {
 
     @GetMapping("/suscripciones/nueva_sus")
     public String nuevaSuscripcion(Model model) {
-        List<Etiqueta> etiquetas = etiquetaService.findAll();
+
+        List<Etiqueta> etiquetas = etiquetaService.getEtiquetasEnOrdenArbol();
+
         model.addAttribute("etiquetas", etiquetas);
         model.addAttribute("suscripcionForm", new SuscripcionForm());
-        model.addAttribute("actionUrl", "/suscripciones/guardar");  
+        model.addAttribute("actionUrl", "/suscripciones/guardar");
+
+        Map<Integer, List<Integer>> relacionesPadreHijo =
+                etiquetaService.obtenerRelacionesPadreHijo();
+        model.addAttribute("relacionesPadreHijo", relacionesPadreHijo);
+
         return "suscripciones/nueva_sus";
     }
 
     @PostMapping("/suscripciones/guardar")
     public String guardarSuscripcion(@ModelAttribute SuscripcionForm form, Principal principal) {
-        Usuario usuario = usService.getCurrentUser(principal); 
-        service.create(form.getEtiquetasSeleccionadas(), usuario.getUsuarioId());
+        Usuario usuario = usService.getCurrentUser(principal);
+        service.create(form.getEtiquetasSeleccionadas(), usuario.getUsuarioId(), form.getNombre());
         return "redirect:/suscripciones";
     }
 
@@ -72,18 +80,27 @@ public class SuscripcionController {
     public String mostrarFormularioEdicion(@PathVariable Integer id, Model model) {
         Suscripcion suscripcion = service.findById(id);
         model.addAttribute("suscripcion", suscripcion);
-        List<Etiqueta> etiquetas = etiquetaService.findAll();
+
+        List<Etiqueta> etiquetas = etiquetaService.getEtiquetasEnOrdenArbol();
         model.addAttribute("etiquetas", etiquetas);
         SuscripcionForm nuestralista = new SuscripcionForm();
-        nuestralista.setEtiquetasSeleccionadas(serviceSE.getEtiquetaIdsPorSuscripcion(suscripcion.getSuscripcionId()));
+
+        nuestralista.setEtiquetasSeleccionadas(
+                serviceSE.getEtiquetaIdsPorSuscripcion(suscripcion.getSuscripcionId()));
+        nuestralista.setNombre(suscripcion.getNombre());
         model.addAttribute("suscripcionForm", nuestralista);
         model.addAttribute("actionUrl", "/suscripciones/editar/" + id + "/guardar");
+
+        Map<Integer, List<Integer>> relacionesPadreHijo =
+                etiquetaService.obtenerRelacionesPadreHijo();
+        model.addAttribute("relacionesPadreHijo", relacionesPadreHijo);
+
         return "suscripciones/nueva_sus";
     }
 
     @PostMapping("/suscripciones/editar/{id}/guardar")
     public String procesarEdicion(@PathVariable Integer id, @ModelAttribute SuscripcionForm form) {
-        serviceSE.update(form.getEtiquetasSeleccionadas(),id);
+        serviceSE.update(form.getEtiquetasSeleccionadas(), id, form.getNombre());
         return "redirect:/suscripciones";
     }
 
