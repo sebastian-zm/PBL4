@@ -1,13 +1,22 @@
 package software.sebastian.oposiciones.model;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.*;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "USUARIO")
-public class Usuario {
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,8 +46,7 @@ public class Usuario {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // getters & setters
-
+    // Getters y Setters
     public Integer getUsuarioId() { return usuarioId; }
     public void setUsuarioId(Integer usuarioId) { this.usuarioId = usuarioId; }
 
@@ -56,4 +64,56 @@ public class Usuario {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    // ------------------- Implementación de UserDetails -------------------
+
+    /**
+     * Implementamos UserDetails para que Spring Security pueda usar
+     * directamente esta clase como principal en el Authentication,
+     * evitando problemas de casteo y facilitando el acceso al usuario 
+     * autenticado con toda su información.
+     */
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        // Mapear permisos a roles - ejemplo simple
+        if ((permisos & 1) == 1) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+        if ((permisos & 2) == 2) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
+        return authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;  // usamos el email como username
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // podrías implementar lógica real si quieres
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // idem
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // idem
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // idem
+    }
 }

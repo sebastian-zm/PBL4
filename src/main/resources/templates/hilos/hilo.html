@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout}">
+<head>
+    <title th:text="'Hilo: ' + ${hilo.titulo}">Hilo</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container my-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0" th:text="${hilo.titulo}">Título del hilo</h5>
+            </div>
+
+            <!-- Chat Box -->
+            <div id="chat-box" class="card-body overflow-auto bg-light" style="height: 400px;">
+                <div th:each="msg : ${mensajes}">
+                    <div th:class="${msg.usuario.nombre == #authentication.name} ? 'text-end' : 'text-start'">
+                        <div class="d-inline-block px-3 py-2 rounded mb-2"
+                             th:classappend="${msg.usuario.nombre == #authentication.name} ? 'bg-primary text-white' : 'bg-white border'">
+                            <div><strong th:text="${msg.usuario.nombre}">Usuario</strong></div>
+                            <div th:text="${msg.contenido}">Mensaje</div>
+                            <div class="small text-muted" th:text="${#temporals.format(msg.createdAt, 'HH:mm dd/MM')}">Hora</div>
+                        </div>
+                        <!-- Botón eliminar (solo ADMIN) -->
+                        <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                            <a th:href="@{/mensajes/borrar/{id}(id=${msg.mensajeId})}" class="btn btn-sm btn-outline-danger ms-2">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de envío -->
+            <div class="card-footer p-3">
+                <div class="input-group">
+                    <input type="text" id="mensaje" class="form-control" placeholder="Escribe tu mensaje..." />
+                    <button class="btn btn-primary" onclick="enviar()">
+                        <i class="fas fa-paper-plane me-1"></i> Enviar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Scripts WebSocket -->
+<th:block layout:fragment="scriptExtras">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+    <script th:inline="javascript">
+        const hiloId = [[${hilo.hiloId}]];
+        const usuarioActual = [[${#authentication.name}]];
+        const socket = new SockJS('/chat');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function () {
+            stompClient.subscribe('/topic/mensajes', function (msg) {
+                const data = JSON.parse(msg.body);
+
+                if (data.hiloId === hiloId) {
+                    const box = document.getElementById('chat-box');
+
+                    const contenedor = document.createElement('div');
+                    contenedor.className = data.usuarioNombre === usuarioActual ? 'text-end' : 'text-start';
+
+                    const burbuja = document.createElement('div');
+                    burbuja.className = 'd-inline-block px-3 py-2 rounded mb-2 ' +
+                        (data.usuarioNombre === usuarioActual ? 'bg-primary text-white' : 'bg-white border');
+
+                    burbuja.innerHTML = `
+                        <div><strong>${data.usuarioNombre}</strong></div>
+                        <div>${data.contenido}</div>
+                        <div class="small text-muted">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    `;
+
+                    contenedor.appendChild(burbuja);
+                    box.appendChild(contenedor);
+
+                    // Auto-scroll al final
+                    box.scrollTop = box.scrollHeight;
+                }
+            });
+        });
+
+        function enviar() {
+            const input = document.getElementById('mensaje');
+            const contenido = input.value.trim();
+
+            if (contenido !== '') {
+                stompClient.send("/app/mensaje", {}, JSON.stringify({
+                    hiloId: hiloId,
+                    contenido: contenido
+                }));
+                input.value = '';
+            }
+        }
+    </script>
+</th:block>
+</body>
+</html>

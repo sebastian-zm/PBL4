@@ -19,6 +19,9 @@
 
     <!-- Custom CSS -->
     <link th:href="@{/css/custom.css}" rel="stylesheet" />
+    
+    <!-- Notificaciones -->
+    <link th:href="@{/css/notificaciones.css}" rel="stylesheet" />
 
     <!-- Thymeleaf will inject additional CSS/JS via fragments if defined in content pages -->
     <th:block layout:fragment="headExtras"></th:block>
@@ -39,18 +42,29 @@
                 aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarMain">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/}"><i class="fas fa-home me-1"></i> Inicio</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/etiquetas}"><i class="fas fa-tags me-1"></i> Etiquetas</a>
+                    
+                    <!-- Botón común para ADMIN y USER: vista solo lectura -->
+                    <li th:if="${#authorization.expression('hasRole(''USER'') or hasRole(''ADMIN'')')}">
+                        <a class="nav-link" th:href="@{/user/etiquetas}">
+                            <i class="fas fa-eye"></i> Ver Etiquetas
+                        </a>
+                    </li>
+
+                    <!-- Solo visible para ADMIN: vista editable -->
+                    <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                        <a class="nav-link" th:href="@{/admin/etiquetas}">
+                            <i class="fas fa-sitemap"></i> Gestionar Etiquetas
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/suscripciones}"><i class="fas fa-star me-1"></i>
-                            Suscripciones</a>
+                            Suscripciones
+                        </a>
                     </li>
 
                     <li><a class="nav-link" th:href="@{/convocatorias}"> <i class="fas fa-bell me-1"></i> BOE</a></li>
@@ -81,6 +95,18 @@
                         </li>
 
                     </tbody>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" href="#" id="notiDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="position-relative d-inline-block">
+                                <i class="fas fa-bell fs-3" id="notiBell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                                    id="notiCount">0</span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" id="notiList" aria-labelledby="notiDropdown">
+                            <li><span class="dropdown-item-text">No tienes notificaciones</span></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -107,6 +133,11 @@
     <!-- Aquí puedes incluir tus scripts personalizados -->
     <script th:src="@{/js/app.js}"></script>
 
+    <!-- SockJS y Stomp.js para WebSockets -->
+    <script th:src="@{/webjars/sockjs-client/1.5.1/sockjs.min.js}"></script>
+    <script th:src="@{/webjars/stomp-websocket/2.3.4/stomp.min.js}"></script>
+
+    <script th:src="@{/js/notificaciones.js}"></script>
     <!-- Fragmento para scripts extra -->
     <th:block layout:fragment="scriptExtras"></th:block>
 

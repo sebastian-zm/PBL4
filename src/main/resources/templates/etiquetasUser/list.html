@@ -1,0 +1,52 @@
+<!-- src/main/resources/templates/etiquetasUser/list.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title layout:fragment="title">Árbol de Etiquetas</title>
+</head>
+<body>
+<section layout:fragment="content">
+  <ul class="list-unstyled" id="treeRoot">
+    <li>
+      <span class="me-2"><i class="fas fa-earth-europe"></i></span>
+      <ul class="list-unstyled ms-4 mt-1">
+        <th:block th:each="node : ${forest}">
+          <li th:replace="~{etiquetasUser/list-fragment :: node(${node})}"></li>
+        </th:block>
+      </ul>
+    </li>
+  </ul>
+</section>
+
+<th:block layout:fragment="scriptExtras">
+  <script>
+  function toggle(el) {
+    // El elemento clickeado será el <svg> si FontAwesome ya lo reemplazó
+    let icon = el.querySelector("svg") || el.querySelector("i") || el;
+
+    if (!icon) return;
+
+    const container = el.closest("li");
+    const sublist = container?.querySelector("ul");
+
+    // Toggle icono (sólo si tiene clase de FA)
+    if (icon.classList.contains("fa-caret-down")) {
+      icon.classList.remove("fa-caret-down");
+      icon.classList.add("fa-caret-right");
+    } else {
+      icon.classList.remove("fa-caret-right");
+      icon.classList.add("fa-caret-down");
+    }
+
+    // Mostrar u ocultar sublista si existe
+    if (sublist) {
+      sublist.style.display = (sublist.style.display === "none") ? "block" : "none";
+    }
+  }
+
+  </script>
+</th:block>
+</body>
+</html>

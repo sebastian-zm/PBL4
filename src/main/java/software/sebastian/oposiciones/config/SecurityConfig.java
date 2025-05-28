@@ -51,10 +51,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/admin/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/etiquetas/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/etiquetas/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/etiquetas/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/etiquetas/**").hasRole("ADMIN")
+                        .requestMatchers("/chat/**", "/topic/**", "/app/**", "/ws/**").permitAll()
+                        .requestMatchers("/foro/**").hasAnyRole("USER")
                         // el resto de URLs (p.ej. /suscripciones, /) autenticado (USER o ADMIN)
                         .anyRequest().authenticated())
                 // 3) login/logout
@@ -69,8 +67,10 @@ public class SecurityConfig {
                     )
                 // 4) CSRF (por defecto ON); vamos a usar cookie repo para poder leerlo en JS/fetch
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
-
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .ignoringRequestMatchers("/api/notifications/**")
+                );
         return http.build();
     }
+
 }
