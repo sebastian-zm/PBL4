@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 set -e
 
 echo "=> Esperando a que MySQL esté listo..."
@@ -17,4 +17,3 @@ FLUSH PRIVILEGES;
 EOF
 
 echo "✅ MySQL preparado: root/root, dev/dev"
-
