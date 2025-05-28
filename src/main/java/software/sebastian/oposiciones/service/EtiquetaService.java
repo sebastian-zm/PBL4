@@ -224,5 +224,4 @@ private void preOrder(TreeNode node, List<Etiqueta> result) {
                 .save(new ArbolEtiqueta(rel.getAncestro(), c, rel.getDistancia() + 1)));
     }
 
-
 }

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout}">
+<head><title>Crear Hilo</title></head>
+<body>
+<main layout:fragment="content">
+    <div class="container">
+        <h2>Nuevo Hilo</h2>
+        <form th:action="@{/foro/crear}" method="post" th:object="${hilo}">
+            <div class="mb-3">
+                <label for="titulo" class="form-label">Título</label>
+                <input type="text" class="form-control" th:field="*{titulo}" required />
+            </div>
+            <button type="submit" class="btn btn-success">Crear</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

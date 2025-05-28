@@ -22,11 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         Usuario u = repo.findByEmail(username)
             .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
 
-        // Mapear permisos a roles
-        List<GrantedAuthority> roles = new ArrayList<>();
-        if ((u.getPermisos() & 1) != 0) { roles.add(new SimpleGrantedAuthority("ROLE_USER")); }
-        if ((u.getPermisos() & 2) != 0) { roles.add(new SimpleGrantedAuthority("ROLE_ADMIN")); }
-
-        return new User(u.getEmail(), u.getPasswordHash(), roles);
+        // Ya que Usuario implementa UserDetails y getAuthorities está implementado ahí,
+        // simplemente devolvemos el objeto Usuario directamente
+        return u;
     }
 }

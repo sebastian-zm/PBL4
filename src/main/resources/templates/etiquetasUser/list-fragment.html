@@ -1,0 +1,22 @@
+<!-- src/main/resources/templates/etiquetasUser/list-fragment.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <li th:fragment="node(node)">
+      <div class="d-flex align-items-center">
+        <!-- Ícono está AQUÍ -->
+        <i class="fas fa-caret-down me-2" style="cursor: pointer;" onclick="toggle(this)"></i>
+
+        <!-- Texto de la etiqueta -->
+        <span th:text="${node.etiqueta.nombre}">Etiqueta</span>
+      </div>
+
+      <!-- recursion -->
+      <ul class="list-unstyled ms-4 mt-1">
+        <th:block th:each="child : ${node.children}">
+          <li th:replace="~{etiquetasUser/list-fragment :: node(${child})}"></li>
+        </th:block>
+      </ul>
+    </li>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Cross-platform workspace initialization script for DevContainer.
 This script prepares the temporary workspace for Java files with rsync-style synchronization.

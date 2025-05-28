@@ -20,6 +20,6 @@ public class EtiquetaUserController {
     public String tree(Model m) {
         List<TreeNode> forest = svc.getTree();
         m.addAttribute("forest", forest);
-        return "etiquetas/tree";
+        return "etiquetasUser/list";
     }
 }

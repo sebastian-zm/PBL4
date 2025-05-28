@@ -1,4 +1,4 @@
-import json
+﻿import json
 import numpy as np
 
 def get_modelo_id(conn, nombre):

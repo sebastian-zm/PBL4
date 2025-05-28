@@ -5,8 +5,6 @@
   "workspaceFolder": "/workspace",
   "shutdownAction": "stopCompose",
 
-  "initializeCommand": "python .devcontainer/scripts/prepare-workspace.py",
-
   "onCreateCommand": [
     "bash",
     "-c",

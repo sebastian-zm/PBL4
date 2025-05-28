@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+    <title>Chat</title>
+</head>
+
+<body>
+<main layout:fragment="content">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-comments me-2"></i> Chat en tiempo real
+                    </div>
+                    <div class="card-body p-3">
+                        <!-- Caja de mensajes -->
+                        <div id="chat-box" class="mb-3 overflow-auto border rounded bg-light p-3" style="height: 400px;">
+                            <ul id="mensajes" class="list-unstyled mb-0"></ul>
+                        </div>
+
+                        <!-- Input de mensaje -->
+                        <div class="input-group">
+                            <input type="text" id="mensaje" class="form-control" placeholder="Escribe tu mensaje..." />
+                            <button class="btn btn-primary" onclick="enviar()">
+                                <i class="fas fa-paper-plane me-1"></i> Enviar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="scriptExtras">
+    <!-- SockJS y STOMP -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+    <script>
+        const socket = new SockJS('/chat');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Conectado: ' + frame);
+
+            stompClient.subscribe('/topic/mensajes', function (msg) {
+                const mensaje = JSON.parse(msg.body);
+                const item = document.createElement('li');
+                item.innerHTML = `<strong>${mensaje.usuario.nombre}:</strong> ${mensaje.contenido}`;
+                document.getElementById('mensajes').appendChild(item);
+            });
+        });
+
+        function enviar() {
+            const input = document.getElementById('mensaje');
+            const contenido = input.value.trim();
+            if (contenido !== '') {
+                stompClient.send('/app/mensaje', {}, contenido);
+                input.value = '';
+            }
+        }
+    </script>
+</th:block>
+</body>
+</html>

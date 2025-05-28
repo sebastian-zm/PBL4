@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout}">
+<head>
+    <title>Hilos del foro</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container">
+        <h2 class="mb-4">Hilos del Foro</h2>
+        <a th:href="@{/foro/crear}" class="btn btn-primary mb-3">
+            <i class="fas fa-plus"></i> Crear nuevo hilo
+        </a>
+        <ul class="list-group">
+            <li class="list-group-item" th:each="hilo : ${hilos}">
+                <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a th:href="@{/foro/borrar/{id}(id=${hilo.hiloId})}" class="btn btn-sm btn-danger mt-2">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </a>
+                </div>
+                <a th:href="@{/foro/{id}(id=${hilo.hiloId})}">
+                    <strong th:text="${hilo.titulo}">Título</strong>
+                </a>
+                <br/>
+                <small class="text-muted">Creado por: <span th:text="${hilo.creador.nombre}">Usuario</span></small>
+            </li>
+        </ul>
+    </div>
+</main>
+</body>
+</html>

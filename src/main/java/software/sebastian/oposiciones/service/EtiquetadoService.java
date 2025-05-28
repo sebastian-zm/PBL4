@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +17,6 @@ import software.sebastian.oposiciones.repository.ArbolEtiquetaRepository;
 import software.sebastian.oposiciones.repository.EtiquetaRepository;
 import software.sebastian.oposiciones.repository.EtiquetadoRepository;
 import software.sebastian.oposiciones.repository.ModeloRepository;
-
 
 @Service
 public class EtiquetadoService {
@@ -154,7 +152,7 @@ public List<Integer> convocatoriasDeEtiquetas(List<Integer> etiquetasSuscripcion
             throw new RuntimeException("Error en tagConvocatoria: " + e.getMessage(), e);
         }
     }
-
+    
     private double cosineSimilarity(double[] a, double[] b) {
         double dot = 0, normA = 0, normB = 0;
         for (int i = 0; i < a.length; i++) {

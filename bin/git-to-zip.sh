@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 set -euo pipefail
 
 # Ruta a tu git compilado, si quieres forzar uno en particular:
@@ -60,4 +60,3 @@ collect_files | while IFS= read -r line; do
   fi
 done
 done
-

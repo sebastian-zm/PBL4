@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 set -e
 
 # Creamos el venv dentro de $HOME para no pisar NTFS-mounted workspace
@@ -18,4 +18,3 @@ else
 fi
 
 echo "✅ Entorno Python listo"
-

@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # Check if a description is provided
 if [ $# -eq 0 ]; then
