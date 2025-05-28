@@ -61,7 +61,6 @@ public class ConvocatoriaService {
         return convocatoriaRepo.findAllById(idDeConvocatorias);
     }
 
-
     /**
      * Guarda o actualiza una convocatoria y dispara el etiquetado asíncrono.
      */

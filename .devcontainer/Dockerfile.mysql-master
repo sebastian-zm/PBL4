@@ -1,0 +1,5 @@
+FROM mysql:8.0
+
+COPY .devcontainer/mysql-config/master.cnf /etc/mysql/conf.d/master.cnf
+
+RUN chmod 644 /etc/mysql/conf.d/master.cnf

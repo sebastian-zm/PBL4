@@ -1,5 +1,4 @@
-﻿#!/usr/bin/env python3
-import sys
+#!/usr/bin/env python3
 import tiktoken
 
 def main():

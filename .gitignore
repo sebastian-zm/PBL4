@@ -40,3 +40,5 @@ __pycache__
 
 /.env
 tmp
+
+/copias
