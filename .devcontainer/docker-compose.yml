@@ -12,7 +12,7 @@ services:
       MYSQL_PASSWORD: dev
       MYSQL_HOST: db
     volumes:
-      # Mount only non-Java files from host
+
       - ../bin:/workspace/bin:cached,Z
       - ../src/main/resources:/workspace/src/main/resources:cached,Z
       - ../src/test/resources:/workspace/src/test/resources:cached,Z
@@ -25,13 +25,13 @@ services:
       - ../requirements.txt:/workspace/requirements.txt:cached,Z
       - ../.env:/workspace/.env:cached,Z
       - ./scripts:/scripts:cached,Z
+
+      - ../copias:/workspace/copias:cached,Z
       - ../src/main/java:/workspace_host/src/main/java:cached,Z
       - ../src/test/java:/workspace_host/src/test/java:cached,Z
-      # Use volumes for Java code and build artifacts
       - pbl4-java-src-main:/workspace/src/main/java:Z
       - pbl4-java-src-test:/workspace/src/test/java:Z
       - pbl4-java-target:/workspace/target:Z
-      # Other volumes
       - pbl4-venv-cache:/home/ubuntu/.venv:Z
       - pbl4-m2-cache:/home/ubuntu/.m2:Z
       - pbl4-npm-cache:/home/ubuntu/.npm:Z
@@ -44,7 +44,10 @@ services:
     user: ubuntu
 
   db:
-    image: docker.io/mysql:8.0
+
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.mysql-master
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -56,12 +59,29 @@ services:
     volumes:
       - pbl4-db-data:/var/lib/mysql:Z
 
+      - ./scripts:/scripts:ro
+
+  db_slave:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.mysql-slave
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    depends_on:
+      - db
+    volumes:
+      - pbl4-db-slave-data:/var/lib/mysql:Z
+      - ./scripts:/scripts:ro
+
 volumes:
   pbl4-db-data:
+  pbl4-db-slave-data:
   pbl4-m2-cache:
   pbl4-npm-cache:
   pbl4-venv-cache:
-  pbl4-java-src-main:  # Volume for main Java source files
-  pbl4-java-src-test:  # Volume for test Java source files
-  pbl4-java-target:    # Volume for compiled classes
-
+  pbl4-java-src-main:
+  pbl4-java-src-test:
+  pbl4-java-target:

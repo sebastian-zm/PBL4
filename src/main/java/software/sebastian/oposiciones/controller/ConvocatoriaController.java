@@ -1,6 +1,5 @@
 package software.sebastian.oposiciones.controller;
 
-
 import java.security.Principal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -61,6 +60,5 @@ public String verConvocatoriasPorSuscripcion(
     model.addAttribute("etiquetasPorConvocatoria", etiquetadoSe.getEtiquetasPorConvocatoria());
     return "convocatorias";
 }
-
 
 }

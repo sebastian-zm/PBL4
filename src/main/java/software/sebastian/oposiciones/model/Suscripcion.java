@@ -17,7 +17,6 @@ public class Suscripcion {
     @Column(nullable = false, unique = true)
     private Integer usuarioId;
 
-
         @Column(nullable = false, unique = true)
     private String nombre;
 
@@ -71,7 +70,7 @@ public class Suscripcion {
     public void setUsuarioId(Integer usuarioId) {
         this.usuarioId = usuarioId;
     }
- @PrePersist
+    @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
