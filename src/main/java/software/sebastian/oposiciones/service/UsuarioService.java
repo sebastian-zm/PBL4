@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import software.sebastian.oposiciones.repository.UsuarioRepository;
 import software.sebastian.oposiciones.model.Usuario;
 
-
 @Service
 public class UsuarioService {
     private final UsuarioRepository userRepo;
@@ -22,15 +21,18 @@ public class UsuarioService {
         return userRepo.findAll();
     }
 
-
     public Usuario getCurrentUser(Principal principal) {
         String username = principal.getName();
-        Usuario usuario = userRepo.findByEmail(username).orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
-        return usuario;
+        return userRepo.findByEmail(username)
+            .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
     }
 
     @Transactional
     public Usuario create(String nombre, String email, String password, Integer permisos) {
+        if (userRepo.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("El correo ya está registrado");
+        }
+
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String passwordHash = passwordEncoder.encode(password);
 
@@ -39,7 +41,6 @@ public class UsuarioService {
         u.setEmail(email);
         u.setPermisos(permisos);
         u.setPasswordHash(passwordHash);
-        Usuario uSaved = userRepo.save(u);
-        return uSaved;
+        return userRepo.save(u);
     }
 }

@@ -1,125 +1,163 @@
-<!-- src/main/resources/templates/etiquetas/tree.html -->
 <!DOCTYPE html>
 <html
   xmlns:th="http://www.thymeleaf.org"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
   layout:decorate="layout"
 >
-  <head>
-    <title layout:fragment="title">Registrarse</title>
-  </head>
-  <body>
-    <main layout:fragment="content">
-      <form method="post" action="/registro" onsubmit="return validarFormulario()">
-        <fieldset>
-          <legend>Crear Usuario</legend>
+<head>
+  <title layout:fragment="title">Registrarse</title>
+</head>
+<body>
+  <main layout:fragment="content">
 
-          <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
+    <!-- Mostrar mensaje de error del backend -->
+    <div th:if="${error}" class="alert alert-danger" role="alert">
+      <p th:text="${error}" style="margin: 0;"></p>
+    </div>
+
+    <form method="post" action="/registro" onsubmit="return validarFormulario()">
+      <fieldset>
+        <legend>Crear Usuario</legend>
+
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre</label>
+          <input
+            name="nombre"
+            type="text"
+            id="nombre"
+            class="form-control"
+            placeholder="Nombre"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input
+            name="email"
+            type="email"
+            id="email"
+            class="form-control"
+            placeholder="Email"
+            required
+            oninput="validarEmail()"
+          />
+          <div id="emailError" class="form-text text-danger d-none">
+            Este correo ya está registrado.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="contrasena" class="form-label">Contraseña</label>
+          <div class="input-group">
             <input
-              name="nombre"
-              type="text"
-              id="nombre"
+              name="contrasena"
+              type="password"
+              id="contrasena"
               class="form-control"
-              placeholder="Nombre"
+              placeholder="Contraseña"
               required
             />
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              onclick="togglePassword('contrasena', this)"
+            >
+              Mostrar
+            </button>
           </div>
+        </div>
 
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
+        <div class="mb-3">
+          <label for="confirmarContrasena" class="form-label">Confirmar Contraseña</label>
+          <div class="input-group">
             <input
-              name="email"
-              type="email"
-              id="email"
+              name="confirmarContrasena"
+              type="password"
+              id="confirmarContrasena"
               class="form-control"
-              placeholder="Email"
+              placeholder="Confirmar Contraseña"
               required
             />
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              onclick="togglePassword('confirmarContrasena', this)"
+            >
+              Mostrar
+            </button>
           </div>
-
-          <div class="mb-3">
-            <label for="contrasena" class="form-label">Contraseña</label>
-            <div class="input-group">
-              <input
-                name="contrasena"
-                type="password"
-                id="contrasena"
-                class="form-control"
-                placeholder="Contraseña"
-                required
-              />
-              <button
-                class="btn btn-outline-secondary"
-                type="button"
-                onclick="togglePassword('contrasena', this)"
-              >
-                Mostrar
-              </button>
-            </div>
+          <div id="mensajeError" class="form-text text-danger d-none">
+            Las contraseñas no coinciden.
           </div>
+        </div>
 
-          <div class="mb-3">
-            <label for="confirmarContrasena" class="form-label">Confirmar Contraseña</label>
-            <div class="input-group">
-              <input
-                name="confirmarContrasena"
-                type="password"
-                id="confirmarContrasena"
-                class="form-control"
-                placeholder="Confirmar Contraseña"
-                required
-              />
-              <button
-                class="btn btn-outline-secondary"
-                type="button"
-                onclick="togglePassword('confirmarContrasena', this)"
-              >
-                Mostrar
-              </button>
-            </div>
-            <div id="mensajeError" class="form-text text-danger d-none">
-              Las contraseñas no coinciden.
-            </div>
-          </div>
-          
-          <!-- Tus campos del formulario aquí -->
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-          <button type="submit" class="btn btn-primary">Registrarse</button>
-        </fieldset>
-      </form>
-    </main>
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit" class="btn btn-primary">Registrarse</button>
+      </fieldset>
+    </form>
+  </main>
 
-    <th:block layout:fragment="scriptExtras">
-      <script th:src="@{/js/tree.js}"></script>
-      <script>
-        // Muestra u oculta la contraseña
-        function togglePassword(inputId, button) {
-          const input = document.getElementById(inputId);
-          if (input.type === "password") {
-            input.type = "text";
-            button.textContent = "Ocultar";
-          } else {
-            input.type = "password";
-            button.textContent = "Mostrar";
-          }
+  <th:block layout:fragment="scriptExtras">
+    <script th:src="@{/js/tree.js}"></script>
+    <script>
+      // Mostrar u ocultar la contraseña
+      function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+          input.type = "text";
+          button.textContent = "Ocultar";
+        } else {
+          input.type = "password";
+          button.textContent = "Mostrar";
+        }
+      }
+
+      // Validación de formulario antes de enviar
+      function validarFormulario() {
+        const pass1 = document.getElementById("contrasena").value;
+        const pass2 = document.getElementById("confirmarContrasena").value;
+        const errorMsg = document.getElementById("mensajeError");
+        const emailError = document.getElementById("emailError");
+
+        if (!emailError.classList.contains("d-none")) {
+          return false;
         }
 
-        // Validación antes de enviar el formulario
-        function validarFormulario() {
-          const pass1 = document.getElementById("contrasena").value;
-          const pass2 = document.getElementById("confirmarContrasena").value;
-          const errorMsg = document.getElementById("mensajeError");
-
-          if (pass1 !== pass2) {
-            errorMsg.classList.remove("d-none");
-            return false; // evita que se envíe el formulario
-          } else {
-            errorMsg.classList.add("d-none");
-            return true;
-          }
+        if (pass1 !== pass2) {
+          errorMsg.classList.remove("d-none");
+          return false;
+        } else {
+          errorMsg.classList.add("d-none");
+          return true;
         }
-      </script>
-    </th:block>
-  </body>
+      }
+
+      // Validar si el correo ya existe en tiempo real
+      function validarEmail() {
+        const emailInput = document.getElementById("email");
+        const emailError = document.getElementById("emailError");
+        const email = emailInput.value.trim();
+
+        if (email === "") {
+          emailError.classList.add("d-none");
+          return;
+        }
+
+        fetch(`/api/usuarios/exists?email=${encodeURIComponent(email)}`)
+          .then(response => response.json())
+          .then(existe => {
+            if (existe) {
+              emailError.classList.remove("d-none");
+            } else {
+              emailError.classList.add("d-none");
+            }
+          })
+          .catch(err => {
+            console.error("Error verificando el email:", err);
+          });
+      }
+    </script>
+  </th:block>
+</body>
 </html>
