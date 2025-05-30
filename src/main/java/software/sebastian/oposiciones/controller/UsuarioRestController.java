@@ -17,4 +17,9 @@ public class UsuarioRestController {
     public boolean emailExists(@RequestParam String email) {
         return userRepo.findByEmail(email).isPresent();
     }
+
+    @GetMapping("/existsApodo")
+    public boolean apodoExists(@RequestParam String apodo) {
+        return userRepo.findByApodo(apodo).isPresent();
+    }
 }

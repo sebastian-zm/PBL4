@@ -10,7 +10,6 @@
 <body>
   <main layout:fragment="content">
 
-    <!-- Mostrar mensaje de error del backend -->
     <div th:if="${error}" class="alert alert-danger" role="alert">
       <p th:text="${error}" style="margin: 0;"></p>
     </div>
@@ -29,6 +28,22 @@
             placeholder="Nombre"
             required
           />
+        </div>
+
+        <div class="mb-3">
+          <label for="apodo" class="form-label">Apodo</label>
+          <input
+            name="apodo"
+            type="text"
+            id="apodo"
+            class="form-control"
+            placeholder="Apodo"
+            required
+            oninput="validarApodo()"
+          />
+          <div id="apodoError" class="form-text text-danger d-none">
+            Este apodo ya está en uso.
+          </div>
         </div>
 
         <div class="mb-3">
@@ -99,28 +114,21 @@
   </main>
 
   <th:block layout:fragment="scriptExtras">
-    <script th:src="@{/js/tree.js}"></script>
     <script>
-      // Mostrar u ocultar la contraseña
       function togglePassword(inputId, button) {
         const input = document.getElementById(inputId);
-        if (input.type === "password") {
-          input.type = "text";
-          button.textContent = "Ocultar";
-        } else {
-          input.type = "password";
-          button.textContent = "Mostrar";
-        }
+        input.type = input.type === "password" ? "text" : "password";
+        button.textContent = input.type === "text" ? "Ocultar" : "Mostrar";
       }
 
-      // Validación de formulario antes de enviar
       function validarFormulario() {
         const pass1 = document.getElementById("contrasena").value;
         const pass2 = document.getElementById("confirmarContrasena").value;
         const errorMsg = document.getElementById("mensajeError");
         const emailError = document.getElementById("emailError");
+        const apodoError = document.getElementById("apodoError");
 
-        if (!emailError.classList.contains("d-none")) {
+        if (!emailError.classList.contains("d-none") || !apodoError.classList.contains("d-none")) {
           return false;
         }
 
@@ -133,28 +141,21 @@
         }
       }
 
-      // Validar si el correo ya existe en tiempo real
       function validarEmail() {
-        const emailInput = document.getElementById("email");
-        const emailError = document.getElementById("emailError");
-        const email = emailInput.value.trim();
-
-        if (email === "") {
-          emailError.classList.add("d-none");
-          return;
-        }
-
+        const email = document.getElementById("email").value.trim();
         fetch(`/api/usuarios/exists?email=${encodeURIComponent(email)}`)
-          .then(response => response.json())
+          .then(r => r.json())
           .then(existe => {
-            if (existe) {
-              emailError.classList.remove("d-none");
-            } else {
-              emailError.classList.add("d-none");
-            }
-          })
-          .catch(err => {
-            console.error("Error verificando el email:", err);
+            document.getElementById("emailError").classList.toggle("d-none", !existe);
+          });
+      }
+
+      function validarApodo() {
+        const apodo = document.getElementById("apodo").value.trim();
+        fetch(`/api/usuarios/existsApodo?apodo=${encodeURIComponent(apodo)}`)
+          .then(r => r.json())
+          .then(existe => {
+            document.getElementById("apodoError").classList.toggle("d-none", !existe);
           });
       }
     </script>
