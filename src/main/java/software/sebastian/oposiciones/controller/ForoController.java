@@ -49,12 +49,19 @@ public class ForoController {
     }
 
     @GetMapping("/{hiloId}")
-    public String verHilo(@PathVariable Integer hiloId, Model model) {
+    public String verHilo(@PathVariable Integer hiloId, Model model, Principal principal) {
         Hilo hilo = hiloRepository.findById(hiloId)
             .orElseThrow(() -> new RuntimeException("Hilo no encontrado"));
+
         model.addAttribute("hilo", hilo);
         model.addAttribute("mensajes", mensajeRepository.findByHilo_HiloIdOrderByCreatedAtAsc(hiloId));
-        return "hilos/hilo"; // plantilla en templates/hilos/hilo.html
+
+        // ✅ Añadir apodo del usuario autenticado
+        Usuario usuario = usuarioRepository.findByEmail(principal.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        model.addAttribute("usuarioApodo", usuario.getApodo());
+
+        return "hilos/hilo";
     }
 
     @GetMapping

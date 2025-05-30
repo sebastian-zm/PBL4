@@ -15,7 +15,7 @@
     "vscode": {
       "settings": {
         "terminal.integrated.shell.linux": "/bin/bash",
-        "maven.executable.path": "/workspace/mvnw",
+        // "maven.executable.path": "/workspace/mvnw",
         // Path to the Python interpreter in the virtual environment.
         "python.defaultInterpreterPath": "${containerEnv:HOME}/.venv/bin/python"
       },

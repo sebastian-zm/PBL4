@@ -26,16 +26,14 @@ public class Usuario implements UserDetails {
     private String nombre;
 
     @Column(nullable = false, unique = true)
+    private String apodo;
+
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String passwordHash;
 
-    /**
-     * Ejemplo de bitmask:
-     *   1 → ROLE_USER
-     *   2 → ROLE_ADMIN
-     */
     @Column(nullable = false)
     private Integer permisos;
 
@@ -46,12 +44,14 @@ public class Usuario implements UserDetails {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // Getters y Setters
     public Integer getUsuarioId() { return usuarioId; }
     public void setUsuarioId(Integer usuarioId) { this.usuarioId = usuarioId; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getApodo() { return apodo; }
+    public void setApodo(String apodo) { this.apodo = apodo; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
@@ -65,55 +65,29 @@ public class Usuario implements UserDetails {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
-    // ------------------- Implementación de UserDetails -------------------
-
-    /**
-     * Implementamos UserDetails para que Spring Security pueda usar
-     * directamente esta clase como principal en el Authentication,
-     * evitando problemas de casteo y facilitando el acceso al usuario 
-     * autenticado con toda su información.
-     */
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        // Mapear permisos a roles - ejemplo simple
-        if ((permisos & 1) == 1) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        }
-        if ((permisos & 2) == 2) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        }
+        if ((permisos & 1) == 1) authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        if ((permisos & 2) == 2) authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         return authorities;
     }
 
     @Override
-    public String getPassword() {
-        return passwordHash;
-    }
+    public String getPassword() { return passwordHash; }
 
     @Override
-    public String getUsername() {
-        return email;  // usamos el email como username
-    }
+    public String getUsername() { return email; }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true; // podrías implementar lógica real si quieres
-    }
+    public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true; // idem
-    }
+    public boolean isAccountNonLocked() { return true; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true; // idem
-    }
+    public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() {
-        return true; // idem
-    }
+    public boolean isEnabled() { return true; }
 }

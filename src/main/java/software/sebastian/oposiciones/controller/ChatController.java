@@ -2,11 +2,13 @@ package software.sebastian.oposiciones.controller;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+
 import software.sebastian.oposiciones.model.Hilo;
 import software.sebastian.oposiciones.model.Mensaje;
 import software.sebastian.oposiciones.model.MensajeDTO;
@@ -17,7 +19,7 @@ import software.sebastian.oposiciones.repository.UsuarioRepository;
 
 @Controller
 public class ChatController {
-    
+
     @Autowired
     private MensajeRepository mensajeRepository;
 
@@ -26,9 +28,9 @@ public class ChatController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-    
+
     public String chat() {
-        return "chat/chat"; // Thymeleaf buscará templates/chat.html
+        return "chat/chat";
     }
 
     @MessageMapping("/mensaje")
@@ -37,7 +39,8 @@ public class ChatController {
         Usuario usuario = usuarioRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        Hilo hilo = hiloRepository.findById(mensajeDTO.getHiloId()).orElseThrow();
+        Hilo hilo = hiloRepository.findById(mensajeDTO.getHiloId())
+                .orElseThrow(() -> new RuntimeException("Hilo no encontrado"));
 
         Mensaje mensaje = new Mensaje();
         mensaje.setContenido(mensajeDTO.getContenido());
@@ -50,9 +53,9 @@ public class ChatController {
         // Crear DTO para frontend
         MensajeDTO dto = new MensajeDTO();
         dto.setContenido(mensaje.getContenido());
-        dto.setUsuarioNombre(usuario.getNombre());
+        dto.setUsuarioApodo(usuario.getApodo()); // 👈 cambio clave aquí
         dto.setHiloId(hilo.getHiloId());
-        dto.setCreatedAt(mensaje.getCreatedAt().toString()); // opcional
+        dto.setCreatedAt(mensaje.getCreatedAt().format(DateTimeFormatter.ofPattern("HH:mm dd/MM")));
 
         return dto;
     }

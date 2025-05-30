@@ -14,14 +14,13 @@
             <!-- Chat Box -->
             <div id="chat-box" class="card-body overflow-auto bg-light" style="height: 400px;">
                 <div th:each="msg : ${mensajes}">
-                    <div th:class="${msg.usuario.nombre == #authentication.name} ? 'text-end' : 'text-start'">
+                    <div th:class="${msg.usuario.apodo == usuarioApodo} ? 'text-end' : 'text-start'">
                         <div class="d-inline-block px-3 py-2 rounded mb-2"
-                             th:classappend="${msg.usuario.nombre == #authentication.name} ? 'bg-primary text-white' : 'bg-white border'">
-                            <div><strong th:text="${msg.usuario.nombre}">Usuario</strong></div>
+                             th:classappend="${msg.usuario.apodo == usuarioApodo} ? 'bg-primary text-white' : 'bg-white border'">
+                            <div><strong th:text="${msg.usuario.apodo}">Usuario</strong></div>
                             <div th:text="${msg.contenido}">Mensaje</div>
                             <div class="small text-muted" th:text="${#temporals.format(msg.createdAt, 'HH:mm dd/MM')}">Hora</div>
                         </div>
-                        <!-- Botón eliminar (solo ADMIN) -->
                         <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                             <a th:href="@{/mensajes/borrar/{id}(id=${msg.mensajeId})}" class="btn btn-sm btn-outline-danger ms-2">
                                 <i class="fas fa-trash-alt"></i>
@@ -51,8 +50,7 @@
 
     <script th:inline="javascript">
         const hiloId = [[${hilo.hiloId}]];
-        const usuarioActual = [[${#authentication.name}]];
-        const socket = new SockJS('/chat');
+        const usuarioActual = [[${usuarioApodo}]];        const socket = new SockJS('/chat');
         const stompClient = Stomp.over(socket);
 
         stompClient.connect({}, function () {
@@ -63,22 +61,20 @@
                     const box = document.getElementById('chat-box');
 
                     const contenedor = document.createElement('div');
-                    contenedor.className = data.usuarioNombre === usuarioActual ? 'text-end' : 'text-start';
+                    contenedor.className = data.usuarioApodo === usuarioActual ? 'text-end' : 'text-start';
 
                     const burbuja = document.createElement('div');
                     burbuja.className = 'd-inline-block px-3 py-2 rounded mb-2 ' +
-                        (data.usuarioNombre === usuarioActual ? 'bg-primary text-white' : 'bg-white border');
+                        (data.usuarioApodo === usuarioActual ? 'bg-primary text-white' : 'bg-white border');
 
                     burbuja.innerHTML = `
-                        <div><strong>${data.usuarioNombre}</strong></div>
+                        <div><strong>${data.usuarioApodo}</strong></div>
                         <div>${data.contenido}</div>
                         <div class="small text-muted">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
                     `;
 
                     contenedor.appendChild(burbuja);
                     box.appendChild(contenedor);
-
-                    // Auto-scroll al final
                     box.scrollTop = box.scrollHeight;
                 }
             });
