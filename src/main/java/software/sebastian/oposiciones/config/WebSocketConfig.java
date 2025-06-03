@@ -26,5 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     // Lo que envían los clientes debe empezar con /app
     registry.setApplicationDestinationPrefixes("/app");
+    registry.setUserDestinationPrefix("/user");
+
   }
 }

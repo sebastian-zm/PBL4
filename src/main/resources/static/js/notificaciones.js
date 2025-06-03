@@ -18,7 +18,7 @@ fetch('/api/notifications/usuarioId')
     const stompClient = Stomp.over(socket);
 
     stompClient.connect({}, () => {
-      stompClient.subscribe(`/topic/notifications/${usuarioId}`, (msg) => {
+      stompClient.subscribe('/user/queue/notificaciones', (msg) => {
         const data = JSON.parse(msg.body); // Asegúrate de que envías JSON desde el backend
         showNotification(data.message, data.id); // <- pasar tanto message como id
       });
@@ -69,6 +69,7 @@ function updateNotiCounter() {
     countElement.classList.remove('d-none');
     document.getElementById('notiBell').classList.add('shake');
   } else {
+    notiList.textContent = ' No tienes notificaciones';
     countElement.classList.add('d-none');
     document.getElementById('notiBell').classList.remove('shake');
   }
