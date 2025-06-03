@@ -20,7 +20,7 @@ fetch('/api/notifications/usuarioId')
     stompClient.connect({}, () => {
       stompClient.subscribe('/user/queue/notificaciones', (msg) => {
         const data = JSON.parse(msg.body); // Asegúrate de que envías JSON desde el backend
-        showNotification(data.message, data.id); // <- pasar tanto message como id
+        showNotification(data.message, data.notificacionId); // <- pasar tanto message como id
       });
     }, (error) => {
       console.error('Error al conectar WebSocket:', error);

@@ -61,9 +61,11 @@ public class ChatController {
 
         Integer usuarioId = hilo.getCreador() != null ? hilo.getCreador().getUsuarioId() : null;
         System.out.println("UsuarioId para notificación: " + usuarioId);
+        Long notiId = null;
+
         // Notificación
         if (usuarioId != null) {
-            notiService.createNotification(usuarioId, usuario.getNombre() + " ha respondido a tu hilo: " + hilo.getTitulo());
+            notiId = notiService.createNotification(usuarioId, usuario.getNombre() + " ha respondido a tu hilo: " + hilo.getTitulo());
         } else {
             // log o manejar error, para evitar excepción al guardar notificación sin usuario
             System.err.println("No se puede crear notificación, usuarioId es null");
@@ -72,7 +74,8 @@ public class ChatController {
         if (!usuario.getUsuarioId().equals(hilo.getCreador().getUsuarioId())) {
             Map<String, Object> notiPayload = Map.of(
                 "message", usuario.getNombre() + " ha respondido a tu hilo: " + hilo.getTitulo(),
-                "id", mensajeDTO.getHiloId()
+                "id", mensajeDTO.getHiloId(),
+                "notificacionId", notiId
             );
 
             System.out.println("Enviando notificación a: " + hilo.getCreador().getEmail());
