@@ -2,11 +2,12 @@ package software.sebastian.oposiciones.controller;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import software.sebastian.oposiciones.model.Hilo;
@@ -16,6 +17,7 @@ import software.sebastian.oposiciones.model.Usuario;
 import software.sebastian.oposiciones.repository.HiloRepository;
 import software.sebastian.oposiciones.repository.MensajeRepository;
 import software.sebastian.oposiciones.repository.UsuarioRepository;
+import software.sebastian.oposiciones.service.NotificationService;
 
 @Controller
 public class ChatController {
@@ -29,6 +31,12 @@ public class ChatController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired    
+    private NotificationService notiService;
+    
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
     public String chat() {
         return "chat/chat";
     }
@@ -36,6 +44,7 @@ public class ChatController {
     @MessageMapping("/mensaje")
     @SendTo("/topic/mensajes")
     public MensajeDTO recibirMensaje(MensajeDTO mensajeDTO, Principal principal) {
+        System.out.println("Mensaje recibido de: " + principal.getName());
         Usuario usuario = usuarioRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -50,12 +59,39 @@ public class ChatController {
 
         mensajeRepository.save(mensaje);
 
-        // Crear DTO para frontend
+        Integer usuarioId = hilo.getCreador() != null ? hilo.getCreador().getUsuarioId() : null;
+        System.out.println("UsuarioId para notificación: " + usuarioId);
+        Long notiId = null;
+
+        // Notificación
+        if (usuarioId != null) {
+            notiId = notiService.createNotification(usuarioId, usuario.getNombre() + " ha respondido a tu hilo: " + hilo.getTitulo());
+        } else {
+            // log o manejar error, para evitar excepción al guardar notificación sin usuario
+            System.err.println("No se puede crear notificación, usuarioId es null");
+        }
+
+        if (!usuario.getUsuarioId().equals(hilo.getCreador().getUsuarioId())) {
+            Map<String, Object> notiPayload = Map.of(
+                "message", usuario.getNombre() + " ha respondido a tu hilo: " + hilo.getTitulo(),
+                "id", mensajeDTO.getHiloId(),
+                "notificacionId", notiId
+            );
+
+            System.out.println("Enviando notificación a: " + hilo.getCreador().getEmail());
+            messagingTemplate.convertAndSendToUser(
+                hilo.getCreador().getEmail(), // email es el "username" del Principal
+                "/queue/notificaciones",
+                notiPayload
+            );        
+        }
+
+        // Aquí es donde envías el mensaje por WebSocket a todos
         MensajeDTO dto = new MensajeDTO();
         dto.setContenido(mensaje.getContenido());
         dto.setUsuarioApodo(usuario.getApodo()); // 👈 cambio clave aquí
         dto.setHiloId(hilo.getHiloId());
-        dto.setCreatedAt(mensaje.getCreatedAt().format(DateTimeFormatter.ofPattern("HH:mm dd/MM")));
+        dto.setCreatedAt(mensaje.getCreatedAt().toString());
 
         return dto;
     }

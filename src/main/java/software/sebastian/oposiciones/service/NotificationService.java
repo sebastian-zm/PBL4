@@ -14,12 +14,14 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepo;
 
-    public void createNotification(Integer usuarioId, String message) {
+    public Long createNotification(Integer usuarioId, String message) {
         Notification n = new Notification();
         n.setUsuarioId(usuarioId);
         n.setMessage(message);
         n.setRead(false);
-        notificationRepo.save(n);
+        Notification nSaved = notificationRepo.save(n);
+
+        return nSaved.getId();
     }
 
     public List<Notification> getUnreadNotifications(Integer usuarioId) {
