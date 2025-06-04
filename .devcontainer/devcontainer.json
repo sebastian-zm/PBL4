@@ -4,20 +4,25 @@
   "service": "app",
   "workspaceFolder": "/workspace",
   "shutdownAction": "stopCompose",
-
   "onCreateCommand": [
     "bash",
     "-c",
     "mkdir -p /workspace/src/main/java /workspace/src/test/java"
   ],
-
   "customizations": {
     "vscode": {
       "settings": {
         "terminal.integrated.shell.linux": "/bin/bash",
         // "maven.executable.path": "/workspace/mvnw",
         // Path to the Python interpreter in the virtual environment.
-        "python.defaultInterpreterPath": "${containerEnv:HOME}/.venv/bin/python"
+        "python.defaultInterpreterPath": "${containerEnv:HOME}/.venv/bin/python",
+        // UTF-8 encoding settings
+        "files.encoding": "utf8",
+        "files.autoGuessEncoding": true,
+        "java.compile.nullAnalysis.mode": "automatic",
+        "java.configuration.runtimes": [],
+        "java.import.gradle.enabled": false,
+        "java.saveActions.organizeImports": true
       },
       "extensions": [
         "redhat.java",
@@ -36,15 +41,12 @@
       ]
     }
   },
-
   "forwardPorts": [3306, 8080, 3000, 8888, 3307],
-
   "postCreateCommand": [
     "bash",
     "-c",
-    "sudo chown -R ubuntu:ubuntu . ~/.{m2,npm,venv} /scripts /workspace_host && /scripts/init-python-env.sh && /scripts/init-db.sh && /scripts/sync-java-files.sh && echo \"✔ Entorno inicializado\""
+    "sudo chown -R ubuntu:ubuntu . ~/.{m2,npm,venv} /scripts /workspace_host && sudo chmod u+x /scripts/* && /scripts/init-python-env.sh && /scripts/init-db.sh && /scripts/sync-java-files.sh && echo \"✔ Entorno inicializado\""
   ],
-
   "mounts": [
     "source=pbl4-m2-cache,target=/home/ubuntu/.m2,type=volume",
     "source=pbl4-npm-cache,target=/home/ubuntu/.npm,type=volume",
