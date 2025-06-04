@@ -20,6 +20,13 @@ fetch('/api/notifications/usuarioId')
     stompClient.connect({}, () => {
       stompClient.subscribe('/user/queue/notificaciones', (msg) => {
         const data = JSON.parse(msg.body); // Asegúrate de que envías JSON desde el backend
+        // ✅ Reproducir sonido de notificación
+        const audio = document.getElementById('notificationSound');
+        if (audio) {
+            audio.play().catch(error => {
+                console.warn('El navegador bloqueó la reproducción automática del sonido:', error);
+            });
+        }
         showNotification(data.message, data.notificacionId); // <- pasar tanto message como id
       });
     }, (error) => {
@@ -80,3 +87,14 @@ document.getElementById('notiDropdown').addEventListener('click', () => {
   document.getElementById('notiBell').classList.remove('shake');
   // No tocar el contador aquí
 });
+
+
+document.addEventListener('click', () => {
+    const audio = document.getElementById('notificationSound');
+    if (audio) {
+        audio.play().then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+        }).catch(() => {});
+    }
+}, { once: true });
