@@ -1,7 +1,12 @@
 package software.sebastian.oposiciones.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "NOTIFICACION")
@@ -27,7 +32,7 @@ public class Notification {
 
     public Long getId() { return id; }
     public Integer getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(Integer usuarioid) { this.usuarioId = usuarioId; }
+    public void setUsuarioId(Integer usuarioId) { this.usuarioId = usuarioId; }
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
     public boolean isRead() { return isRead; }
