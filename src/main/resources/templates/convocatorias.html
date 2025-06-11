@@ -99,9 +99,27 @@
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
                                     <span th:each="etiqueta : ${etiquetasPorConvocatoria[c.convocatoriaId]}"
-                                        class="badge bg-secondary text-white p-2">
+                                        class="badge bg-secondary text-white p-2 position-relative">
                                         <i class="bi bi-tag-fill me-1"></i>
                                         <span th:text="${etiqueta.nombre}"></span>
+
+                                        <!-- Botones de evaluación -->
+                                        <div class="mt-2 d-flex gap-1">
+                                            <button class="btn btn-sm btn-success btn-feedback"
+                                                    th:attr="data-convocatoria-id=${c.convocatoriaId},
+                                                            data-etiqueta-id=${etiqueta.etiquetaId},
+                                                            data-usuario-id=${#authentication.principal.usuarioId},
+                                                            data-aprobado=true">
+                                                👍
+                                            </button>
+                                            <button class="btn btn-sm btn-danger btn-feedback"
+                                                    th:attr="data-convocatoria-id=${c.convocatoriaId},
+                                                            data-etiqueta-id=${etiqueta.etiquetaId},
+                                                            data-usuario-id=${#authentication.principal.usuarioId},
+                                                            data-aprobado=false">
+                                                👎
+                                            </button>
+                                        </div>
                                     </span>
                                 </div>
                             </td>
@@ -118,6 +136,56 @@
     </main>
     <th:block layout:fragment="scriptExtras">
         <!-- Scripts adicionales si son necesarios -->
+         <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                document.querySelectorAll(".btn-feedback").forEach(btn => {
+                const usuarioId = btn.dataset.usuarioId;
+                const convocatoriaId = btn.dataset.convocatoriaId;
+                const etiquetaId = btn.dataset.etiquetaId;
+
+                // Verifica si ya se envió feedback
+                fetch(`/api/feedback/ya-evaluado?usuarioId=${usuarioId}&convocatoriaId=${convocatoriaId}&etiquetaId=${etiquetaId}`)
+                    .then(res => res.json())
+                    .then(yaEvaluado => {
+                    if (yaEvaluado) {
+                        btn.disabled = true;
+                    }
+                    });
+
+                btn.addEventListener("click", function () {
+                    const aprobado = btn.dataset.aprobado === "true";
+
+                    fetch("/api/feedback", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        usuarioId: usuarioId,
+                        convocatoriaId: convocatoriaId,
+                        etiquetaId: etiquetaId,
+                        aprobado: aprobado
+                    })
+                    })
+                    .then(res => {
+                        if (!res.ok) {
+                        return res.json().then(err => { throw err; });
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        alert("Feedback enviado: " + data.message);
+                        // Desactiva ambos botones
+                        document.querySelectorAll(`[data-convocatoria-id='${convocatoriaId}'][data-etiqueta-id='${etiquetaId}']`)
+                        .forEach(btn => btn.disabled = true);
+                    })
+                    .catch(err => {
+                        alert("Error: " + (err.error || "ya has evaluado esta etiqueta"));
+                    });
+                });
+                });
+            });
+            </script>
     </th:block>
 </body>
 
