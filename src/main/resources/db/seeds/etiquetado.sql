@@ -1,67 +1,131 @@
-use oposiciones;
+USE oposiciones;
 
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 1, 1);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 2, 3);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 3, 5);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 4, 7);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 5, 8);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 6, 9);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 7, 10);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 8, 11);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 9, 12);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 10, 13);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 11, 14);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 12, 15);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 13, 16);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 14, 18);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 15, 20);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 16, 22);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 17, 23);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 18, 24);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 19, 25);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 20, 27);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 21, 29);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 22, 30);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 23, 31);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 24, 32);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 25, 33);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 26, 34);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 27, 35);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 28, 36);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 29, 37);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 30, 38);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 31, 39);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 32, 40);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 33, 41);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 34, 42);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 35, 43);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 36, 44);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 37, 45);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 38, 46);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 39, 47);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 40, 48);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 41, 49);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 42, 50);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 43, 52);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 44, 53);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 45, 54);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 46, 55);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 47, 56);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 48, 57);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 49, 58);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 50, 59);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 1, 60);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 2, 61);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 3, 62);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 4, 63);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 5, 64);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 6, 65);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 7, 66);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 8, 67);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 9, 68);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 10, 69);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 11, 70);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 12, 71);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 13, 72);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 13, 36);
-INSERT INTO ETIQUETADO (modeloID, convocatoriaID, etiquetaId) VALUES (1, 13, 37);
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(1, 3, 0, 1, 1, 1),   -- Madrid
+(1, 72, 0, 1, 1, 1),  -- Administración General del Estado
+(1, 73, 0, 1, 1, 1),  -- Ministerio del Interior
+
+(2, 3, 0, 1, 1, 1),
+(2, 74, 0, 1, 1, 1),  -- Tribunal Constitucional
+
+(3, 3, 0, 1, 1, 1),
+(3, 75, 0, 1, 1, 1),  -- Ministerio de Ciencia, Innovación y Universidades
+
+(4, 53, 0, 1, 1, 1),
+(4, 76, 0, 1, 1, 1),  -- Diputación Provincial
+
+(5, 20, 0, 1, 1, 1),
+(5, 77, 0, 1, 1, 1),  -- Ayuntamiento de Avilés
+
+(6, 20, 0, 1, 1, 1),
+(6, 78, 0, 1, 1, 1),  -- Ayuntamiento de Gijón
+
+(7, 3, 0, 1, 1, 1),
+(7, 79, 0, 1, 1, 1),  -- Ayuntamiento de Villanueva de la Cañada
+
+(8, 3, 0, 1, 1, 1),
+(8, 80, 0, 1, 1, 1),  -- Ayuntamiento de Torrelodones
+
+(9, 50, 0, 1, 1, 1),
+(9, 81, 0, 1, 1, 1),  -- Ayuntamiento de Palma de Mallorca
+
+(10, 44, 0, 1, 1, 1),
+(10, 82, 0, 1, 1, 1), -- Ayuntamiento de Villanueva de la Serena
+
+(11, 42, 0, 1, 1, 1),
+(11, 83, 0, 1, 1, 1), -- Ayuntamiento de Dos Hermanas
+
+(12, 42, 0, 1, 1, 1),
+(12, 84, 0, 1, 1, 1), -- Ayuntamiento de Almensilla
+
+(13, 42, 0, 1, 1, 1),
+(13, 85, 0, 1, 1, 1), -- Ayuntamiento de Sanlúcar la Mayor
+
+(14, 30, 0, 1, 1, 1),
+(14, 86, 0, 1, 1, 1), -- Ayuntamiento de Barcelona
+
+(15, 3, 0, 1, 1, 1),
+(15, 87, 0, 1, 1, 1); -- Ayuntamiento de Madrid
+
+
+-- 16
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(16, 71, 0, 1, 1, 1),  -- Valencia
+(16, 88, 0, 1, 1, 1);  -- Informática
+
+-- 17
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(17, 39, 0, 1, 1, 1),  -- Huelva
+(17, 89, 0, 1, 1, 1),  -- Medioambiente y Patrimonio
+(17, 90, 0, 1, 1, 1);  -- Policía Local
+
+-- 18
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(18, 71, 0, 1, 1, 1),
+(18, 91, 0, 1, 1, 1);
+
+-- 19
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(19, 12, 0, 1, 1, 1),
+(19, 92, 0, 1, 1, 1);
+
+-- 20
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(20, 71, 0, 1, 1, 1),
+(20, 93, 0, 1, 1, 1),
+(20, 90, 0, 1, 1, 1);  -- Policía Local
+
+-- 21
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(21, 58, 0, 1, 1, 1),
+(21, 94, 0, 1, 1, 1),
+(21, 95, 0, 1, 1, 1),
+(21, 96, 0, 1, 1, 1);
+
+-- 22
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(22, 10, 0, 1, 1, 1),
+(22, 97, 0, 1, 1, 1),
+(22, 98, 0, 1, 1, 1);
+
+-- 23
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(23, 40, 0, 1, 1, 1),
+(23, 99, 0, 1, 1, 1),
+(23, 100, 0, 1, 1, 1),
+(23, 101, 0, 1, 1, 1);
+
+-- 24
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(24, 37, 0, 1, 1, 1),
+(24, 102, 0, 1, 1, 1);
+
+-- 25
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(25, 40, 0, 1, 1, 1),
+(25, 103, 0, 1, 1, 1);
+
+-- 26
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(26, 31, 0, 1, 1, 1),
+(26, 104, 0, 1, 1, 1);
+
+-- 27
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(27, 32, 0, 1, 1, 1),
+(27, 105, 0, 1, 1, 1);
+
+-- 28
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(28, 31, 0, 1, 1, 1),
+(28, 106, 0, 1, 1, 1);
+
+-- 29
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(29, 31, 0, 1, 1, 1),
+(29, 107, 0, 1, 1, 1);
+
+-- 30
+INSERT INTO ETIQUETADO (convocatoriaId, etiquetaId, valoracion, confianza, modeloId, status) VALUES
+(30, 71, 0, 1, 1, 1),
+(30, 108, 0, 1, 1, 1);
