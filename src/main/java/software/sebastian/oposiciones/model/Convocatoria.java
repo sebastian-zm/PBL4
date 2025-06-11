@@ -30,6 +30,9 @@ public class Convocatoria {
     @Column(nullable = false)
     private String enlace;
 
+    @Column(columnDefinition = "JSON")
+    private String datosExtra;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -95,5 +98,13 @@ public class Convocatoria {
 
     public void setEnlace(String enlace) {
         this.enlace = enlace;
+    }
+
+    public String getDatosExtra() {
+        return datosExtra;
+    }
+
+    public void setDatosExtra(String datosExtra) {
+        this.datosExtra = datosExtra;
     }
 }

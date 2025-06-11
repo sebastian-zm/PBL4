@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Script to run ConvocatoriaGeneratorService in CLI mode
+# This runs the Spring Boot application with a special profile that executes and exits
+
+# Change to the project root directory
+cd "$(dirname "$0")/.." || exit 1
+
+echo "Running convocatoria generation in CLI mode..."
+
+# Run with the generate-convocatorias profile
+./mvnw spring-boot:run -Dspring-boot.run.profiles=generate-convocatorias
+
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "Convocatoria generation completed successfully."
+else
+    echo "Convocatoria generation failed with exit code: $EXIT_CODE"
+    exit $EXIT_CODE
+fi

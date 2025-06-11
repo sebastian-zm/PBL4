@@ -21,7 +21,8 @@ import software.sebastian.oposiciones.repository.ModeloRepository;
 public class EtiquetadoService {
 
     private static final String EMBEDDING_MODEL = "text-embedding-3-large";
-    private static final double UMBRAL = 0.4;
+    private static final double UMBRAL_GUARDADO = 0.4;
+    private static final double UMBRAL_MOSTRAR = 0.4;
 
     private final EtiquetadoRepository etiquetadoRepo;
     private final ModeloRepository modeloRepo;
@@ -110,7 +111,7 @@ public List<Integer> convocatoriasDeEtiquetas(List<Integer> etiquetasSuscripcion
             int suscripcionId = relacion.getConvocatoriaId();
             Etiqueta etiqueta = etiquetaPorId.get(relacion.getEtiquetaId());
 
-            if (etiqueta != null) {
+            if (etiqueta != null && relacion.getConfianza() > UMBRAL_MOSTRAR) {
                 resultado.computeIfAbsent(suscripcionId, k -> new ArrayList<>()).add(etiqueta);
             }
         }
@@ -136,9 +137,9 @@ public List<Integer> convocatoriasDeEtiquetas(List<Integer> etiquetasSuscripcion
             // Por cada etiqueta, calcular similitud y persistir en ETIQUETADO si supera umbral
             embeddingsPorEtiqueta.forEach((etiquetaId, embLabel) -> {
                 double sim = cosineSimilarity(embConv, embLabel);
-                if (sim >= UMBRAL) {
+                if (sim >= UMBRAL_GUARDADO) {
 
-                    Etiquetado et = new Etiquetado(convocatoriaId, etiquetaId, modeloId, null, // valoración
+                    Etiquetado et = new Etiquetado(convocatoriaId, etiquetaId, modeloId, 0, // valoración
                                                                                                // (puede
                                                                                                // quedar
                                                                                                // a

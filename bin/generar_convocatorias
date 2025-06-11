@@ -1,244 +1,34 @@
-﻿#!/usr/bin/env python3
+#!/bin/bash
 
-import requests
-import feedparser
-import pdfplumber
-import json
-import re
-from datetime import datetime
-from pathlib import Path
-import mysql.connector
-import csv
-from bs4 import BeautifulSoup
-from lib.db_config import db_config
+# Script to manually trigger the ConvocatoriaGeneratorService
+# This calls the Spring Boot application's REST endpoint to generate convocatorias
 
-# ----------------------------
-# CONFIGURACIÓN
-# ----------------------------
-RSS_URL = "https://www.boe.es/rss/canal_per.php?l=p&c=140"
-PDF_DIR = Path("pdfs")
-PDF_DIR.mkdir(parents=True, exist_ok=True)
-LOG_CSV = Path("python/boe/log_fallos.csv")
+# Configuration
+BASE_URL="http://localhost:8080"
+ADMIN_USER="${ADMIN_USER:-admin1@example.com}"
+ADMIN_PASS="${ADMIN_PASS:-admin1}"
 
-# ------------------------------------------------
-# 1) Clasificación y mapeo de números
-# ------------------------------------------------
+# Check if the application is running
+if ! curl -s "$BASE_URL/actuator/health" > /dev/null 2>&1; then
+    echo "Error: Spring Boot application is not running on port 8080"
+    echo "Please start the application first with: ./mvnw spring-boot:run"
+    exit 1
+fi
 
-def classify_convocation(text):
-    tl = text.lower()
-    if any(k in tl for k in ["ayuntamiento de", "diputación", "cabildo", "consell insular", "mancomunidad", "administración local"]):
-        return "municipal"
-    elif any(k in tl for k in ["universidad de", "consorcio", "empresa pública"]):
-        return "otros"
-    elif any(k in tl for k in ["ministerio de", "subsecretaría", "secretaría de estado", "dirección general", "guardia civil", "policía nacional", "cuerpo de"]):
-        return "estatal"
-    else:
-        return "otros"
+echo "Triggering convocatoria generation..."
 
-num_map = {
-    "cero": 0, "uno": 1, "una": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5,
-    # … completa hasta donde necesites …
-    "cien": 100
-}
+# Call the REST endpoint with basic auth
+RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+    -u "$ADMIN_USER:$ADMIN_PASS" \
+    "$BASE_URL/admin/convocatorias/generate")
 
-def word_to_number(w):
-    return num_map.get(w, None)
+HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+BODY=$(echo "$RESPONSE" | sed '$d')
 
-# ------------------------------------------------
-# 2) Función principal de extracción
-# ------------------------------------------------
-
-def extract_fields(text):
-    tipo = classify_convocation(text)
-    organo = plazas = denominacion = localidad = plazo = ""
-    warnings = []
-
-    if tipo == "municipal":
-        # … tu regex para municipal …
-        pass  # reemplaza con tu implementación
-    elif tipo == "estatal":
-        # … tu regex para estatal …
-        pass
-    else:
-        # … tu regex para otros …
-        pass
-
-    return {
-        "tipo": tipo,
-        "órgano": organo,
-        "número de plazas": plazas,
-        "denominación": denominacion,
-        "localidad/provincia": localidad,
-        "plazo de solicitud": plazo,
-        "warnings": warnings
-    }
-
-# ----------------------------
-# FUNCIONES AUXILIARES
-# ----------------------------
-
-def extraer_texto_div_textoxslt(texto):
-    """
-   Extrae el texto dentro del div con id="textoxslt".
-    Retorna el texto plano extraído o cadena vacía si no se encuentra o error.
-    """
-    try:
-        soup = BeautifulSoup(texto, "html.parser")
-        div = soup.find("div", id="textoxslt")
-        if div:
-            return div.get_text(separator="\n", strip=True)
-        else:
-            print(f"⚠️ No se encontró el div #textoxslt en texto.")
-            return ""
-    except Exception as e:
-        print(f"⚠️ Error analizando texto: {e}")
-        return ""
-
-
-def descargar_pdf(url):
-    """
-    Descarga un PDF desde la URL si es un PDF válido.
-    """
-    nombre_pdf = url.split("/")[-1]
-    path = PDF_DIR / nombre_pdf
-    if not path.exists():
-        print(f"⬇️ Intentando descargar PDF: {nombre_pdf}")
-        res = requests.get(url)
-        if res.status_code == 200 and res.content.startswith(b"%PDF"):
-            with open(path, "wb") as f:
-                f.write(res.content)
-        else:
-            print(f"⚠️ PDF no disponible o inválido: {url}")
-            return None
-    return path
-
-
-def leer_pdf(path):
-    """
-    Lee un PDF con pdfplumber y devuelve su texto.
-    """
-    try:
-        with pdfplumber.open(path) as pdf:
-            return "\n".join(page.extract_text() or "" for page in pdf.pages)
-    except Exception as e:
-        print(f"⚠️ Error leyendo PDF {path.name}: {e}")
-        return ""
-
-
-def descargar_html(link, boe_id):
-    """
-    Intenta descargar el HTML con la fecha dada.
-    """
-    res = requests.get(link)
-    texto = res.text if res.status_code == 200 else ""
-    if res.status_code == 200 and "boe" in texto.lower() and "disposición" in texto.lower():
-        texto = extraer_texto_div_textoxslt(texto)
-        if texto.strip():
-            print(f"📄 Usando TXT para {boe_id}")
-            return texto
-    print(f"❌  TXT vacío o no válido para {boe_id}")
-    return ""
-
-
-def log_error(boe_id, motivo):
-    """
-    Registra errores en un CSV para revisarlos posteriormente.
-    """
-    if not LOG_CSV.exists():
-        with open(LOG_CSV, mode="w", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
-            writer.writerow(["boeId", "motivo", "timestamp"] )
-    with open(LOG_CSV, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([boe_id, motivo, datetime.now().isoformat()])
-
-# ----------------------------
-# PROCESO PRINCIPAL
-# ----------------------------
-
-def main():
-    print("📡 Leyendo feed RSS del BOE...")
-    feed = feedparser.parse(RSS_URL)
-
-    conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor()
-
-    for entry in feed.entries:
-        # 1) Extraer BOE ID desde entry.link (txt.php?id=...)
-        m = re.search(r"id=(BOE-A-\d{4}-\d+)", entry.link)
-        boe_id = m.group(1) if m else None
-
-        if not boe_id:
-            print(f"⚠️ No se pudo obtener el BOE ID para {entry.link}")
-            log_error("N/A", "BOE ID no extraído")
-            continue
-
-        # 2) Usar GUID para el PDF y pubDate para la fecha
-        pdf_url = entry.guid
-        fecha = entry.published_parsed
-
-        # 3) Descargar y leer HTML
-        texto = ""
-        texto = descargar_html(entry.link, boe_id)
-
-        # 4) Si falta contenido, fallback PDF
-        if not texto.strip():
-            pdf_path = descargar_pdf(pdf_url)
-            if pdf_path:
-                texto = leer_pdf(pdf_path)
-
-        if not texto.strip():
-            print(f"⚠️ {boe_id}: sin contenido legible en PDF ni HTML.")
-            log_error(boe_id, "Sin PDF ni HTML disponible")
-            continue
-
-        # 5) Extraer campos y fecha de publicación
-        campos = extract_fields(texto)
-        fecha_publi = datetime(*fecha[:6]).strftime("%Y-%m-%d %H:%M:%S") if fecha else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        # 6) Preparar datos para DB
-        titulo = entry.title
-        datos_extra = {
-            "órgano": campos['órgano'],
-            "plazas": campos['número de plazas'],
-            "localidad": campos['localidad/provincia'],
-            "plazo": campos['plazo de solicitud'],
-            "tipo": campos['tipo'],
-            "warnings": campos['warnings']
-        }
-        for key in list(datos_extra):
-            if not datos_extra[key]:
-                del datos_extra[key]
-            
-            
-
-        sql = """
-        INSERT INTO CONVOCATORIA
-        (boeId, titulo, texto, fechaPublicacion, enlace, datosExtra, createdAt, updatedAt)
-        VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
-        ON DUPLICATE KEY UPDATE
-            titulo = VALUES(titulo),
-            texto = VALUES(texto),
-            fechaPublicacion = VALUES(fechaPublicacion),
-            enlace = VALUES(enlace),
-            datosExtra = VALUES(datosExtra),
-            updatedAt = NOW()
-        """
-
-        cursor.execute(sql, (
-            boe_id,
-            titulo,
-            texto,
-            fecha_publi,
-            entry.link,
-            json.dumps(datos_extra, ensure_ascii=False)
-        ))
-
-        print(f"✅ {boe_id} insertado correctamente.")
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-if __name__ == "__main__":
-    main()
+if [ "$HTTP_CODE" = "200" ]; then
+    echo "Success: $BODY"
+else
+    echo "Error: HTTP $HTTP_CODE"
+    echo "$BODY"
+    exit 1
+fi

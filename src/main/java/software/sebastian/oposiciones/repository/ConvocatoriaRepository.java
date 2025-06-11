@@ -3,6 +3,8 @@ package software.sebastian.oposiciones.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import software.sebastian.oposiciones.model.Convocatoria;
 
+import java.util.Optional;
+
 public interface ConvocatoriaRepository extends JpaRepository<Convocatoria, Integer> {
-    // podrías añadir métodos como findByBoeId(...) si los necesitas
+    Optional<Convocatoria> findByBoeId(String boeId);
 }

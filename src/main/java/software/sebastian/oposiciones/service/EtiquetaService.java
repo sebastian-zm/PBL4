@@ -68,6 +68,7 @@ private void preOrder(TreeNode node, List<Etiqueta> result) {
         return etiquetaRepo.findAll();
     }
 
+    @Transactional
     public Etiqueta create(String nombre, String formato) {
         Etiqueta e = new Etiqueta();
         e.setNombre(nombre);
