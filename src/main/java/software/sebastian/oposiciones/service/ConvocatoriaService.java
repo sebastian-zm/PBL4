@@ -67,8 +67,7 @@ public class ConvocatoriaService {
     @Transactional
     public Convocatoria saveOrUpdate(Convocatoria convocatoria) {
         Convocatoria saved = convocatoriaRepo.save(convocatoria);
-        // Etiquetado en background, no bloquea la petición
-        taggingService.tagConvocatoriaAsync(saved.getConvocatoriaId());
+        taggingService.tagConvocatoria(saved.getConvocatoriaId());
         return saved;
     }
 

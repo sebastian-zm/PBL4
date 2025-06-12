@@ -22,7 +22,7 @@ public class EtiquetadoService {
 
     private static final String EMBEDDING_MODEL = "text-embedding-3-large";
     private static final double UMBRAL_GUARDADO = 0.4;
-    private static final double UMBRAL_MOSTRAR = 0.4;
+    private static final double UMBRAL_MOSTRAR = 0.52;
 
     private final EtiquetadoRepository etiquetadoRepo;
     private final ModeloRepository modeloRepo;
@@ -45,10 +45,10 @@ public class EtiquetadoService {
     }
 
     @Async("taggingExecutor")
-    @Transactional
     public CompletableFuture<Void> tagConvocatoriaAsync(Integer convocatoriaId) {
-        tagConvocatoria(convocatoriaId);
-        return CompletableFuture.completedFuture(null);
+        return CompletableFuture.runAsync(() -> {
+            tagConvocatoria(convocatoriaId);
+        });
     }
 
 
@@ -119,7 +119,8 @@ public List<Integer> convocatoriasDeEtiquetas(List<Integer> etiquetasSuscripcion
         return resultado;
     }
 
-    private void tagConvocatoria(Integer convocatoriaId) {
+    @Transactional
+    public void tagConvocatoria(Integer convocatoriaId) {
         try {
             // Obtener el embedding de la convocatoria usando el servicio especializado
             double[] embConv =
@@ -138,14 +139,10 @@ public List<Integer> convocatoriasDeEtiquetas(List<Integer> etiquetasSuscripcion
             embeddingsPorEtiqueta.forEach((etiquetaId, embLabel) -> {
                 double sim = cosineSimilarity(embConv, embLabel);
                 if (sim >= UMBRAL_GUARDADO) {
-
-                    Etiquetado et = new Etiquetado(convocatoriaId, etiquetaId, modeloId, 0, // valoración
-                                                                                               // (puede
-                                                                                               // quedar
-                                                                                               // a
-                                                                                               // null)
-                            sim);
-                    etiquetadoRepo.save(et);
+                    if (!etiquetadoRepo.findById(new Etiquetado.PrimaryKey(convocatoriaId, etiquetaId, modeloId)).isPresent()) {
+                        Etiquetado et = new Etiquetado(convocatoriaId, etiquetaId, modeloId, 0,sim);
+                        etiquetadoRepo.save(et);
+                    }
                 }
             });
         } catch (Exception e) {

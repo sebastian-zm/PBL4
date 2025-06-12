@@ -19,6 +19,7 @@ public abstract class ModeloEmbeddingService<E> {
   private final OpenAIClient openAIClient;
   private final ModeloRepository modeloRepo;
   private final ModeloEmbeddingRepository modeloEmbeddingRepo;
+  private final TokenizerPythonCaller tokenizerPythonCaller;
 
   public ModeloEmbeddingService(OpenAIClient openAIClient,
                                       ModeloRepository modeloRepo,
@@ -26,9 +27,11 @@ public abstract class ModeloEmbeddingService<E> {
     this.openAIClient = openAIClient;
     this.modeloRepo = modeloRepo;
     this.modeloEmbeddingRepo = modeloEmbeddingRepo;
+    this.tokenizerPythonCaller = new TokenizerPythonCaller();
   }
 
   String EMBEDDING_MODEL = "text-embedding-3-large";
+  int MAX_TOKENS = 8191;
 
   /** Carga la entidad por su ID, o lanza excepción si no existe */
   abstract E loadEntity(Integer id);
@@ -53,6 +56,14 @@ public abstract class ModeloEmbeddingService<E> {
     if (input == null || input.trim().isEmpty()) {
       throw new IllegalStateException("Sin input para el embedding: " + entityType + id);
     }
+    
+    // Truncar el input usando TokenizerPythonCaller
+    try {
+      input = tokenizerPythonCaller.truncarTextoPorTokens(EMBEDDING_MODEL, MAX_TOKENS, input);
+    } catch (Exception e) {
+      throw new RuntimeException("Error al truncar el texto: " + e.getMessage(), e);
+    }
+    
     // Obtener modeloId
     Integer modeloId = modeloRepo.findByNombre(EMBEDDING_MODEL)
         .orElseThrow(() -> new IllegalStateException("Modelo embedding no encontrado: " + EMBEDDING_MODEL))
