@@ -4,7 +4,7 @@ fetch('/api/notifications/unread')
   .then(response => response.json())
   .then(notifications => {
     notifications.forEach(notification => {
-      showNotification(notification.message, notification.id); // <- importante: pasar también ID
+      showNotification(notification.message, notification.id); // importante: pasar también ID
     });
   })
   .catch(error => console.error('Error al cargar notificaciones no leídas:', error));
@@ -27,7 +27,7 @@ fetch('/api/notifications/usuarioId')
                 console.warn('El navegador bloqueó la reproducción automática del sonido:', error);
             });
         }
-        showNotification(data.message, data.notificacionId); // <- pasar tanto message como id
+        showNotification(data.message, data.notificacionId); // pasar tanto message como id
       });
     }, (error) => {
       console.error('Error al conectar WebSocket:', error);

@@ -19,7 +19,7 @@
                              th:classappend="${msg.usuario.apodo == usuarioApodo} ? 'bg-primary text-white' : 'bg-white border'">
                             <div><strong th:text="${msg.usuario.apodo}">Usuario</strong></div>
                             <div th:text="${msg.contenido}">Mensaje</div>
-                            <div class="small text-muted" th:text="${#temporals.format(msg.createdAt, 'HH:mm dd/MM')}">Hora</div>
+                            <div class="small text-muted" th:text="${#temporals.format(msg.createdAt, 'HH:mm')}">Hora</div>
                         </div>
                         <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                             <a th:href="@{/mensajes/borrar/{id}(id=${msg.mensajeId})}" class="btn btn-sm btn-outline-danger ms-2">

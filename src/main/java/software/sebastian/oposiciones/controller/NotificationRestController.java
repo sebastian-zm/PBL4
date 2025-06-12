@@ -1,13 +1,16 @@
 package software.sebastian.oposiciones.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import software.sebastian.oposiciones.model.Notification;
-import software.sebastian.oposiciones.service.NotificationService;
-import software.sebastian.oposiciones.model.Usuario;
-import org.springframework.security.core.Authentication;
-
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import software.sebastian.oposiciones.model.Notification;
+import software.sebastian.oposiciones.model.Usuario;
+import software.sebastian.oposiciones.service.NotificationService;
 
 @RestController
 @RequestMapping("/api/notifications")
@@ -29,7 +32,7 @@ public class NotificationRestController {
 
     @GetMapping("/unread")
     public List<Notification> getUnreadNotifications(Authentication authentication) {
-        Usuario usuario = (Usuario) authentication.getPrincipal(); // O usa usuarioService si prefieres
+        Usuario usuario = (Usuario) authentication.getPrincipal(); 
         return notificationService.getUnreadNotifications(usuario.getUsuarioId());
     }
 }
