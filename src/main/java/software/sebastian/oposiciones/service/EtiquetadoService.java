@@ -22,7 +22,7 @@ public class EtiquetadoService {
 
     private static final String EMBEDDING_MODEL = "text-embedding-3-large";
     private static final double UMBRAL_GUARDADO = 0.4;
-    private static final double UMBRAL_MOSTRAR = 0.52;
+    private static final double UMBRAL_MOSTRAR = 0.54;
 
     private final EtiquetadoRepository etiquetadoRepo;
     private final ModeloRepository modeloRepo;
